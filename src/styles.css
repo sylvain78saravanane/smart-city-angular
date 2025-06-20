@@ -1,0 +1,396 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* html, body { height: 100%; } */
+/* body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; } */
+
+/* Import Tailwind v4 */
+@import "tailwindcss";
+
+/* Angular Material Blue Azure Theme */
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Configuration Tailwind v4 harmonisée avec Blue Azure */
+@theme {
+  /* Couleurs primaires - Blue Azure */
+  --color-primary-50: #e3f2fd;
+  --color-primary-100: #bbdefb;
+  --color-primary-200: #90caf9;
+  --color-primary-300: #64b5f6;
+  --color-primary-400: #42a5f5;
+  --color-primary-500: #2196f3;  /* Bleu principal Azure */
+  --color-primary-600: #1e88e5;
+  --color-primary-700: #1976d2;
+  --color-primary-800: #1565c0;
+  --color-primary-900: #0d47a1;
+
+  /* Couleurs accent - Cyan/Teal pour compléter Azure */
+  --color-accent-50: #e0f2f1;
+  --color-accent-100: #b2dfdb;
+  --color-accent-200: #80cbc4;
+  --color-accent-300: #4db6ac;
+  --color-accent-400: #26a69a;
+  --color-accent-500: #009688;
+  --color-accent-600: #00897b;
+  --color-accent-700: #00796b;
+  --color-accent-800: #00695c;
+  --color-accent-900: #004d40;
+
+  /* Couleurs de warn - Orange pour contraster */
+  --color-warn-50: #fff3e0;
+  --color-warn-100: #ffe0b2;
+  --color-warn-200: #ffcc80;
+  --color-warn-300: #ffb74d;
+  --color-warn-400: #ffa726;
+  --color-warn-500: #ff9800;
+  --color-warn-600: #fb8c00;
+  --color-warn-700: #f57c00;
+  --color-warn-800: #ef6c00;
+  --color-warn-900: #e65100;
+
+  /* Grays harmonisés avec Azure */
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+
+  /* Couleurs sémantiques */
+  --color-success-50: #f0fdf4;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+
+  --color-error-50: #fef2f2;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+
+  --color-info-50: #eff6ff;
+  --color-info-500: #3b82f6;
+  --color-info-600: #2563eb;
+
+  /* Polices */
+  --font-family-sans: 'Inter', 'Roboto', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Espacement personnalisé */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Styles de base */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--font-family-sans);
+  background-color: #fafbfc;
+}
+
+/* Customisation Angular Material avec couleurs Blue Azure */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-focus-overlay {
+  background-color: var(--color-primary-500);
+}
+
+.mat-mdc-card {
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  background: white;
+}
+
+.mat-mdc-button {
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-radius: var(--radius-md);
+}
+
+.mat-mdc-button.mat-primary {
+  background-color: var(--color-primary-500);
+}
+
+.mat-mdc-button.mat-primary:hover {
+  background-color: var(--color-primary-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.mat-mdc-button.mat-accent {
+  background-color: var(--color-accent-500);
+}
+
+.mat-mdc-button.mat-warn {
+  background-color: var(--color-warn-500);
+}
+
+/* Toolbar personnalisée */
+.mat-toolbar {
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800));
+  color: white;
+}
+
+/* Menu personnalisé */
+.mat-mdc-menu-panel {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Sidenav personnalisé */
+.mat-drawer {
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+/* Snackbar personnalisé avec couleurs Azure */
+.success-snackbar {
+  --mdc-snackbar-container-color: var(--color-success-500);
+  --mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+.error-snackbar {
+  --mdc-snackbar-container-color: var(--color-error-500);
+  --mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+.warning-snackbar {
+  --mdc-snackbar-container-color: var(--color-warning-500);
+  --mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+.info-snackbar {
+  --mdc-snackbar-container-color: var(--color-primary-500);
+  --mdc-snackbar-supporting-text-color: #ffffff;
+}
+
+/* Classes utilitaires personnalisées avec @utility */
+@utility {
+  /* Gradients avec thème Azure */
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+  }
+
+  .gradient-primary-light {
+    background: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-300));
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-700));
+  }
+
+  .gradient-azure-sky {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb, #90caf9);
+  }
+
+  /* Ombres personnalisées */
+  .shadow-azure {
+    box-shadow: 0 10px 25px -5px rgba(33, 150, 243, 0.3), 0 10px 10px -5px rgba(33, 150, 243, 0.1);
+  }
+
+  .shadow-accent {
+    box-shadow: 0 10px 25px -5px rgba(0, 150, 136, 0.2), 0 10px 10px -5px rgba(0, 150, 136, 0.1);
+  }
+
+  /* Bordures avec couleurs thème */
+  .border-primary {
+    border-color: var(--color-primary-300);
+  }
+
+  .border-accent {
+    border-color: var(--color-accent-300);
+  }
+
+  /* Backgrounds avec opacité */
+  .bg-primary-soft {
+    background-color: rgba(33, 150, 243, 0.1);
+  }
+
+  .bg-accent-soft {
+    background-color: rgba(0, 150, 136, 0.1);
+  }
+
+  /* Glass effect avec Azure */
+  .glass-azure {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(33, 150, 243, 0.2);
+  }
+}
+
+/* Variantes personnalisées avec @variant */
+@variant {
+  .hover-azure:hover {
+    background-color: var(--color-primary-50);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.4);
+  }
+}
+
+/* Animations personnalisées */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.8);
+  }
+}
+
+/* Classes d'animation */
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.glow-animation {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Scrollbar avec couleurs Azure */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-300);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-500);
+}
+
+/* Classes utilitaires pour le responsive */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .mobile-padding {
+    padding: 1rem;
+  }
+}
+
+/* Classes pour les états de chargement */
+.loading-shimmer {
+  background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Classes pour les notifications avec thème Azure */
+.notification-azure {
+  background: var(--color-primary-500);
+  color: white;
+  border-left: 4px solid var(--color-primary-700);
+}
+
+.notification-success {
+  background: var(--color-success-50);
+  color: var(--color-success-800);
+  border-left: 4px solid var(--color-success-500);
+}
+
+.notification-warning {
+  background: var(--color-warning-50);
+  color: var(--color-warning-800);
+  border-left: 4px solid var(--color-warning-500);
+}
+
+.notification-error {
+  background: var(--color-error-50);
+  color: var(--color-error-800);
+  border-left: 4px solid var(--color-error-500);
+}
