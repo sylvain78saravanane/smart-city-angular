@@ -1,0 +1,148 @@
+<!-- Footer principal -->
+<footer class="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
+
+  <!-- Section principale du footer -->
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+      <!-- Section Logo et Description -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Logo et titre -->
+        <div class="flex items-center space-x-3">
+          <div class="bg-blue-500 p-3 rounded-lg shadow-lg">
+            <mat-icon class="text-white text-2xl">location_city</mat-icon>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">Smart City IoT</h3>
+            <p class="text-blue-300 text-sm">Connectons notre ville</p>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="text-gray-300 text-sm leading-relaxed max-w-md">
+          Smart City IoT révolutionne la gestion urbaine grâce aux technologies IoT.
+          Surveillez en temps réel la qualité de l'air, la température, le trafic et bien plus encore
+          pour une ville plus intelligente et durable.
+        </p>
+
+        <!-- Informations de contact -->
+        <div class="space-y-2 text-sm text-gray-300">
+          <div class="flex items-center space-x-2">
+            <lucide-icon [img]="mapPinIcon" class="w-4 h-4 text-blue-400"></lucide-icon>
+            <span>{{ contactInfo.address }}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <lucide-icon [img]="phoneIcon" class="w-4 h-4 text-blue-400"></lucide-icon>
+            <span>{{ contactInfo.phone }}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <lucide-icon [img]="mailIcon" class="w-4 h-4 text-blue-400"></lucide-icon>
+            <span>{{ contactInfo.email }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Navigation -->
+      <div class="space-y-4">
+        <h4 class="text-lg font-semibold text-white">Navigation</h4>
+        <ul class="space-y-3">
+          @for (link of navigationLinks; track link.route) {
+            <li>
+              <a
+                [routerLink]="link.route"
+                class="flex items-center space-x-2 text-gray-300 hover:text-blue-400 transition-colors duration-200 text-sm">
+                <mat-icon class="text-base">{{ link.icon }}</mat-icon>
+                <span>{{ link.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Section Légal -->
+      <div class="space-y-4">
+        <h4 class="text-lg font-semibold text-white">Informations légales</h4>
+        <ul class="space-y-3">
+          @for (link of legalLinks; track link.route) {
+            <li>
+              <a
+                [routerLink]="link.route"
+                class="text-gray-300 hover:text-blue-400 transition-colors duration-200 text-sm">
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+
+        <!-- Certifications et badges -->
+        <div class="pt-4 space-y-2">
+          <div class="flex items-center space-x-2 text-xs text-gray-400">
+            <mat-icon class="text-green-400 text-sm">verified</mat-icon>
+            <span>RGPD Conforme</span>
+          </div>
+          <div class="flex items-center space-x-2 text-xs text-gray-400">
+            <mat-icon class="text-green-400 text-sm">security</mat-icon>
+            <span>SSL Sécurisé</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Séparateur -->
+  <mat-divider class="border-gray-700"></mat-divider>
+
+  <!-- Section réseaux sociaux et copyright -->
+  <div class="container mx-auto px-4 py-6">
+    <div class="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
+
+      <!-- Réseaux sociaux -->
+      <div class="flex items-center space-x-4">
+        <span class="text-sm text-gray-400">Suivez-nous :</span>
+        @for (social of socialLinks; track social.url) {
+          <button
+            mat-icon-button
+            class="social-button"
+            (click)="onSocialLinkClick(social.url)"
+            [attr.aria-label]="'Suivre sur ' + social.label"
+            [style.--social-color]="social.color">
+
+            <!-- Utilisation des icônes Lucide pour les réseaux sociaux -->
+            <lucide-icon
+              [img]="social.lucideIcon"
+              class="w-5 h-5">
+            </lucide-icon>
+          </button>
+        }
+      </div>
+
+      <!-- Copyright et informations -->
+      <div class="flex flex-col lg:flex-row items-center space-y-2 lg:space-y-0 lg:space-x-6 text-sm text-gray-400">
+        <div class="flex items-center space-x-4" style="margin-left: 15px">
+          <span>&copy;{{ currentYear }} Smart City IoT.</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span>Tous droits réservés.</span>
+        </div>
+
+        <!-- Bouton retour en haut -->
+        <button
+          mat-icon-button
+          class="scroll-to-top"
+          (click)="onScrollToTop()"
+          aria-label="Retour en haut de page">
+          <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bande de statut/maintenance (optionnelle) -->
+  <div class="bg-blue-600 px-4 py-2 text-center">
+    <div class="flex items-center justify-center space-x-2 text-sm">
+      <lucide-icon [img]="wifiIcon" class="w-4 h-4 text-green-300 animate-pulse"></lucide-icon>
+      <span class="text-blue-100">Système opérationnel</span>
+      <lucide-icon [img]="checkCircleIcon" class="w-4 h-4 text-green-300"></lucide-icon>
+    </div>
+  </div>
+</footer>

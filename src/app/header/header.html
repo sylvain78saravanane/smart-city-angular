@@ -1,3 +1,86 @@
-<p>header works!</p>
+<!-- Header Principal -->
+<mat-toolbar class="navbar-azure shadow-lg">
+  <div class="w-full flex items-center justify-between">
 
+    <!-- Logo (à gauche) -->
+    <div class="flex items-center">
+      <a routerLink="/" class="flex items-center space-x-2 hover-scale">
+        <mat-icon class="text-white text-3xl">location_city</mat-icon>
+        <span class="text-xl font-bold text-white">Smart City IoT</span>
+      </a>
+    </div>
 
+    <!-- Menu Hamburger (à droite) -->
+    <button
+      mat-icon-button
+      class="text-white"
+      (click)="toggleMobileMenu()"
+      aria-label="Ouvrir le menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
+
+<!-- Menu Mobile (Overlay) -->
+@if (isMobileMenuOpen()) {
+  <div class="fixed inset-0 z-50">
+    <!-- Backdrop -->
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+      (click)="closeMobileMenu()">
+    </div>
+
+    <!-- Menu Content - Animation depuis la droite -->
+    <div class="fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-white shadow-2xl transform transition-transform">
+      <!-- Header du menu mobile -->
+      <div class="navbar-azure p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <mat-icon class="text-white text-2xl">location_city</mat-icon>
+          <span class="text-lg font-bold text-white">Smart City IoT</span>
+        </div>
+        <button
+          mat-icon-button
+          class="text-white"
+          (click)="closeMobileMenu()"
+          aria-label="Fermer le menu">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Items du menu mobile -->
+      <nav class="p-4 space-y-3">
+        <a
+          routerLink="/mentions-legales"
+          class="flex items-center p-3 rounded-lg hover-azure transition-all duration-200"
+          (click)="onMenuItemClick()">
+          <mat-icon class="mr-3 text-blue-500">gavel</mat-icon>
+          <span class="text-gray-700 font-medium">Mentions légales</span>
+        </a>
+
+        <a
+          routerLink="/contact"
+          class="flex items-center p-3 rounded-lg hover-azure transition-all duration-200"
+          (click)="onMenuItemClick()">
+          <mat-icon class="mr-3 text-blue-500">contact_mail</mat-icon>
+          <span class="text-gray-700 font-medium">Contact</span>
+        </a>
+
+        <div class="border-t border-gray-200 my-4"></div>
+
+        <a
+          routerLink="/login"
+          class="flex items-center p-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200"
+          (click)="onMenuItemClick()">
+          <mat-icon class="mr-3">login</mat-icon>
+          <span class="font-medium">Se connecter</span>
+        </a>
+      </nav>
+
+      <!-- Footer du menu mobile -->
+      <div class="absolute bottom-4 left-4 right-4 text-center">
+        <p class="text-sm text-gray-500">Smart City IoT v1.0</p>
+        <p class="text-xs text-gray-400">Connectons notre ville</p>
+      </div>
+    </div>
+  </div>
+}

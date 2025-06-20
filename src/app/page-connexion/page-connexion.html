@@ -1,0 +1,125 @@
+<!-- Container principal avec fond gradient -->
+<app-header></app-header>
+<div class="min-h-screen gradient-azure-sky flex items-center justify-center p-4">
+
+  <!-- Card de connexion -->
+  <mat-card class="w-full max-w-md card-azure fade-in-up">
+    <mat-card-header class="text-center pb-6">
+      <!-- Logo et titre -->
+      <div class="flex flex-col items-center space-y-4 w-full">
+        <div>
+          <img src="./assets/images/logo_smartcity.png" alt="Smart City IoT Logo" class="w-12 h-12 object-contain">
+        </div>
+        <div>
+          <mat-card-title class="text-2xl font-bold text-gray-800 mb-2">
+            Connexion Citoyen
+          </mat-card-title>
+          <mat-card-subtitle class="text-gray-600">
+            Accédez à votre espace Smart City IoT
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Formulaire de connexion -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <!-- Champ Email -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Adresse email</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="votre.email@exemple.com"
+            autocomplete="email">
+          <mat-icon matPrefix class="mr-2 text-gray-400">email</mat-icon>
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Champ Mot de passe -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Mot de passe</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="motDePasse"
+            placeholder="Votre mot de passe"
+            autocomplete="current-password">
+          <mat-icon matPrefix class="mr-2 text-gray-400">lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (loginForm.get('motDePasse')?.invalid && loginForm.get('motDePasse')?.touched) {
+            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Options -->
+        <div class="flex items-center justify-between">
+          <mat-checkbox formControlName="rememberMe" color="primary">
+            Se souvenir de moi
+          </mat-checkbox>
+
+          <button
+            type="button"
+            mat-button
+            color="primary"
+            class="text-sm"
+            (click)="onForgotPassword()">
+            Mot de passe oublié ?
+          </button>
+        </div>
+
+        <!-- Bouton de connexion -->
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="w-full h-12 btn-azure text-lg font-medium"
+          [disabled]="isLoading()">
+
+          @if (isLoading()) {
+            <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+            <span>Connexion en cours...</span>
+          } @else {
+            <span style="color: white">Se connecter</span>
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <!-- Footer de la card -->
+    <mat-card-actions class="flex flex-col space-y-4 pt-6">
+      <!-- Séparateur -->
+      <div class="flex items-center w-full">
+        <div class="flex-1 border-t border-gray-300"></div>
+        <button mat-button>
+          Nouveau Citoyen ?
+        </button>
+        <div class="flex-1 border-t border-gray-300"></div>
+      </div>
+
+      <!-- Bouton d'inscription -->
+      <button
+        style="margin-bottom: 1pc"
+        mat-stroked-button
+        color="accent"
+        class="w-full h-11"
+        (click)="onRegister()">
+        <mat-icon class="mr-2">person_add</mat-icon>
+        Créer un compte
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+<app-footer></app-footer>

@@ -1,0 +1,191 @@
+/* Styles spécifiques au composant de connexion */
+
+/* Container principal */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Card de connexion */
+.card-azure {
+  max-width: 28rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Animation d'entrée */
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header de la card */
+mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 1.5rem;
+}
+
+/* Styles pour les champs de formulaire */
+mat-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  margin-bottom: 0.5rem;
+}
+
+/* Style pour les icônes dans les champs */
+mat-icon[matPrefix] {
+  margin-right: 0.5rem;
+  color: #6b7280;
+}
+
+/* Bouton principal */
+.btn-azure {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.5rem;
+  min-height: 3rem;
+}
+
+.btn-azure:hover:not(:disabled) {
+  box-shadow: 0 10px 25px -5px rgba(33, 150, 243, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-azure:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner de chargement */
+mat-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+/* Styles pour les erreurs */
+mat-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+}
+
+/* Checkbox personnalisé */
+mat-checkbox {
+  font-size: 0.875rem;
+}
+
+/* Liens et boutons secondaires */
+button[mat-button] {
+  font-size: 0.875rem;
+  transition: color 0.2s ease-in-out;
+}
+
+button[mat-button]:hover {
+  color: #1976d2;
+}
+
+/* Bouton d'inscription */
+button[mat-stroked-button] {
+  border-color: #009688;
+  color: #009688;
+  transition: all 0.2s ease-in-out;
+}
+
+button[mat-stroked-button]:hover {
+  background-color: rgba(0, 150, 136, 0.04);
+  border-color: #00796b;
+  color: #00796b;
+}
+
+/* Zone d'information de test */
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.border-blue-200 {
+  border-color: #bfdbfe;
+}
+
+.text-blue-800 {
+  color: #1e40af;
+}
+
+.text-blue-700 {
+  color: #1d4ed8;
+}
+
+/* Séparateur */
+.border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+/* Informations additionnelles (desktop) */
+.bg-opacity-20 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .card-azure {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  mat-card-content {
+    padding: 1rem;
+  }
+
+  .absolute.bottom-8.left-8 {
+    display: none;
+  }
+}
+
+/* Amélioration de l'accessibilité */
+button:focus {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Animation hover pour la card */
+.card-azure:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Style pour le logo */
+.shadow-azure {
+  box-shadow: 0 10px 25px -5px rgba(33, 150, 243, 0.3);
+}
+
+/* Transition douce pour tous les éléments interactifs */
+* {
+  transition: all 0.2s ease-in-out;
+}
