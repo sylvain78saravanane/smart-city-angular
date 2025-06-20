@@ -6,10 +6,12 @@
   <mat-card class="w-full max-w-md card-azure fade-in-up">
     <mat-card-header class="text-center pb-6">
       <!-- Logo et titre -->
+
+      <div>
+        <img src="./assets/images/logo_smartcity.png" alt="Smart City IoT Logo" class="w-48 h-48 object-contain">
+      </div>
+
       <div class="flex flex-col items-center space-y-4 w-full">
-        <div>
-          <img src="./assets/images/logo_smartcity.png" alt="Smart City IoT Logo" class="w-12 h-12 object-contain">
-        </div>
         <div>
           <mat-card-title class="text-2xl font-bold text-gray-800 mb-2">
             Connexion Citoyen
@@ -81,45 +83,40 @@
         </div>
 
         <!-- Bouton de connexion -->
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          class="w-full h-12 btn-azure text-lg font-medium"
-          [disabled]="isLoading()">
+        <div style="display: flex; justify-content: center">
+          <button
+            style="width: 15pc;"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="w-full h-12 btn-azure text-lg font-medium"
+            [disabled]="isLoading()">
 
-          @if (isLoading()) {
-            <mat-spinner diameter="20" class="mr-2"></mat-spinner>
-            <span>Connexion en cours...</span>
-          } @else {
-            <span style="color: white">Se connecter</span>
-          }
-        </button>
+            @if (isLoading()) {
+              <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+              <span>Connexion en cours...</span>
+            } @else {
+              <span style="color: white">Se connecter</span>
+            }
+          </button>
+        </div>
       </form>
     </mat-card-content>
 
     <!-- Footer de la card -->
-    <mat-card-actions class="flex flex-col space-y-4 pt-6">
-      <!-- Séparateur -->
-      <div class="flex items-center w-full">
-        <div class="flex-1 border-t border-gray-300"></div>
-        <button mat-button>
-          Nouveau Citoyen ?
+    <div style="display: flex; justify-content: center">
+      <mat-card-actions class="flex flex-col space-y-10 pt-4">
+        <button
+          style="width: 15pc;margin-bottom: 1pc"
+          mat-stroked-button
+          color="accent"
+          class="w-full h-11"
+          (click)="onRegister()">
+          <mat-icon class="mr-2">person_add</mat-icon>
+          Créer un compte
         </button>
-        <div class="flex-1 border-t border-gray-300"></div>
-      </div>
-
-      <!-- Bouton d'inscription -->
-      <button
-        style="margin-bottom: 1pc"
-        mat-stroked-button
-        color="accent"
-        class="w-full h-11"
-        (click)="onRegister()">
-        <mat-icon class="mr-2">person_add</mat-icon>
-        Créer un compte
-      </button>
-    </mat-card-actions>
+      </mat-card-actions>
+    </div>
   </mat-card>
 </div>
 <app-footer></app-footer>

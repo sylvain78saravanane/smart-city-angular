@@ -38,7 +38,6 @@ export class Footer {
   navigationLinks = [
     { label: 'Accueil', route: '/', icon: 'home' },
     { label: 'À propos', route: '/about', icon: 'info' },
-    { label: 'Services', route: '/services', icon: 'build' },
     { label: 'Contact', route: '/contact', icon: 'contact_mail' }
   ];
 

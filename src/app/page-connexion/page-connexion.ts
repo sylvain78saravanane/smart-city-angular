@@ -12,7 +12,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {Router} from '@angular/router';
 import {Header} from '../header/header';
 import {Footer} from '../footer/footer';
-import {MatRadioButton} from '@angular/material/radio';
+import {AuthService} from '../services/auth.service';
 
 export interface LoginRequest {
   email: string;
@@ -44,7 +44,6 @@ export interface LoginResponse {
     MatCheckboxModule,
     Header,
     Footer,
-    MatRadioButton
   ],
   templateUrl: './page-connexion.html',
   styleUrl: './page-connexion.css'
@@ -59,8 +58,8 @@ export class PageConnexion {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
-    // private authService: AuthService // À décommenter quand le service sera créé
+    private snackBar: MatSnackBar,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -81,8 +80,7 @@ export class PageConnexion {
       // Simulation d'appel API - À remplacer par le vrai service
       this.simulateLogin(loginData);
 
-      // Code réel à utiliser avec le service:
-      /*
+
       this.authService.login(loginData).subscribe({
         next: (response: LoginResponse) => {
           this.handleLoginSuccess(response);
@@ -94,7 +92,6 @@ export class PageConnexion {
           this.isLoading.set(false);
         }
       });
-      */
     } else {
       this.markFormGroupTouched();
     }
@@ -132,13 +129,16 @@ export class PageConnexion {
     // Redirection selon le type d'utilisateur
     switch (response.typeUtilisateur) {
       case 'CITOYEN':
-        this.router.navigate(['/dashboard/citoyen']);
+        this.router.navigate(['/dashboard']);
         break;
       case 'ADMINISTRATEUR':
         this.router.navigate(['/dashboard/admin']);
         break;
       case 'GESTIONNAIRE_VILLE':
         this.router.navigate(['/dashboard/gestionnaire']);
+        break;
+      case 'CHERCHEUR':
+        this.router.navigate(['/dashboard/chercheur']);
         break;
       default:
         this.router.navigate(['/dashboard']);
@@ -206,5 +206,16 @@ export class PageConnexion {
 
   onRegister() {
     this.router.navigate(['/register']);
+  }
+
+  // Gestion d'erreur pour l'image
+  onImageError(event: any) {
+    console.log('Erreur de chargement de l\'image:', event);
+    // Cacher l'image et montrer l'icône fallback
+    event.target.style.display = 'none';
+    const fallbackIcon = document.querySelector('#fallbackIcon');
+    if (fallbackIcon) {
+      fallbackIcon.classList.remove('hidden');
+    }
   }
 }
