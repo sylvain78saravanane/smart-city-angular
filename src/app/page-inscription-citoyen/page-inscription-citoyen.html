@@ -1,0 +1,357 @@
+<!-- Header -->
+<app-header></app-header>
+
+<!-- Container principal avec fond gradient -->
+<div class="min-h-screen gradient-azure-sky flex items-center justify-center p-4">
+
+  <!-- Card d'inscription -->
+  <mat-card class="w-full max-w-2xl card-azure fade-in-up">
+
+    <!-- Header de la card -->
+    <mat-card-header class="text-center pb-6">
+      <div class="flex flex-col items-center space-y-4 w-full">
+        <!-- Logo -->
+        <div class="bg-blue-500 p-4 rounded-full shadow-azure">
+          <mat-icon class="text-white text-4xl">person_add</mat-icon>
+        </div>
+
+        <div>
+          <mat-card-title class="text-3xl font-bold text-gray-800 mb-2">
+            Rejoignez Smart City IoT
+          </mat-card-title>
+          <mat-card-subtitle class="text-gray-600 text-lg">
+            Devenez un citoyen connecté de votre ville intelligente
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <!-- Indicateur de progression -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          @for (step of [0, 1, 2]; track step) {
+            <div class="flex items-center" [class.flex-1]="step < 2">
+              <!-- Icône de l'étape -->
+              <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300"
+                   [class]="currentStep() > step || isStepValid(step) ?
+                           'bg-blue-500 border-blue-500 text-white' :
+                           currentStep() === step ?
+                           'border-blue-500 text-blue-500 bg-blue-50' :
+                           'border-gray-300 text-gray-400'">
+                <mat-icon class="text-xl">{{ getStepIcon(step) }}</mat-icon>
+              </div>
+
+              <!-- Ligne de connexion -->
+              @if (step < 2) {
+                <div class="flex-1 h-1 mx-4 rounded transition-all duration-300"
+                     [class]="currentStep() > step ? 'bg-blue-500' : 'bg-gray-200'">
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Labels des étapes -->
+        <div class="flex justify-between text-sm">
+          <span [class]="currentStep() >= 0 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+            Informations personnelles
+          </span>
+          <span [class]="currentStep() >= 1 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+            Adresse
+          </span>
+          <span [class]="currentStep() >= 2 ? 'text-blue-600 font-medium' : 'text-gray-500'">
+            Sécurité & Localisation
+          </span>
+        </div>
+      </div>
+
+      <!-- Formulaire d'inscription -->
+      <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <!-- Étape 1: Informations personnelles -->
+        @if (currentStep() === 0) {
+          <div formGroupName="informationsPersonnelles" class="space-y-4 slide-in-right">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Vos informations personnelles</h3>
+
+            <!-- Nom et Prénom -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Nom</mat-label>
+                <input matInput formControlName="nom" placeholder="Votre nom de famille">
+                <mat-icon matPrefix class="mr-2 text-gray-400">person</mat-icon>
+                @if (inscriptionForm.get('informationsPersonnelles.nom')?.invalid && inscriptionForm.get('informationsPersonnelles.nom')?.touched) {
+                  <mat-error>{{ getErrorMessage('informationsPersonnelles', 'nom') }}</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Prénom</mat-label>
+                <input matInput formControlName="prenom" placeholder="Votre prénom">
+                <mat-icon matPrefix class="mr-2 text-gray-400">person</mat-icon>
+                @if (inscriptionForm.get('informationsPersonnelles.prenom')?.invalid && inscriptionForm.get('informationsPersonnelles.prenom')?.touched) {
+                  <mat-error>{{ getErrorMessage('informationsPersonnelles', 'prenom') }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <!-- Email -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Adresse email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="votre.email@exemple.com">
+              <mat-icon matPrefix class="mr-2 text-gray-400">email</mat-icon>
+              @if (inscriptionForm.get('informationsPersonnelles.email')?.invalid && inscriptionForm.get('informationsPersonnelles.email')?.touched) {
+                <mat-error>{{ getErrorMessage('informationsPersonnelles', 'email') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Date de naissance -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Date de naissance</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="dateNaissance">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-icon matPrefix class="mr-2 text-gray-400">cake</mat-icon>
+              @if (inscriptionForm.get('informationsPersonnelles.dateNaissance')?.invalid && inscriptionForm.get('informationsPersonnelles.dateNaissance')?.touched) {
+                <mat-error>{{ getErrorMessage('informationsPersonnelles', 'dateNaissance') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Téléphone (optionnel) -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Téléphone (optionnel)</mat-label>
+              <input matInput type="tel" formControlName="telephone" placeholder="0123456789">
+              <mat-icon matPrefix class="mr-2 text-gray-400">phone</mat-icon>
+              @if (inscriptionForm.get('informationsPersonnelles.telephone')?.invalid && inscriptionForm.get('informationsPersonnelles.telephone')?.touched) {
+                <mat-error>{{ getErrorMessage('informationsPersonnelles', 'telephone') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        }
+
+        <!-- Étape 2: Adresse -->
+        @if (currentStep() === 1) {
+          <div formGroupName="adresse" class="space-y-4 slide-in-right">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Votre adresse</h3>
+
+            <!-- Numéro de rue -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Numéro de rue (optionnel)</mat-label>
+              <input matInput formControlName="numeroRue" placeholder="123">
+              <mat-icon matPrefix class="mr-2 text-gray-400">home</mat-icon>
+              @if (inscriptionForm.get('adresse.numeroRue')?.invalid && inscriptionForm.get('adresse.numeroRue')?.touched) {
+                <mat-error>{{ getErrorMessage('adresse', 'numeroRue') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Adresse -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Adresse complète</mat-label>
+              <input matInput formControlName="adresse" placeholder="Rue de la Paix">
+              <mat-icon matPrefix class="mr-2 text-gray-400">location_on</mat-icon>
+              @if (inscriptionForm.get('adresse.adresse')?.invalid && inscriptionForm.get('adresse.adresse')?.touched) {
+                <mat-error>{{ getErrorMessage('adresse', 'adresse') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Code postal -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Code postal</mat-label>
+              <input matInput formControlName="codePostal" placeholder="75001">
+              <mat-icon matPrefix class="mr-2 text-gray-400">local_post_office</mat-icon>
+              @if (inscriptionForm.get('adresse.codePostal')?.invalid && inscriptionForm.get('adresse.codePostal')?.touched) {
+                <mat-error>{{ getErrorMessage('adresse', 'codePostal') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        }
+
+        <!-- Étape 3: Sécurité et localisation -->
+        @if (currentStep() === 2) {
+          <div formGroupName="securite" class="space-y-6 slide-in-right">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Sécurité et préférences</h3>
+
+            <!-- Mots de passe -->
+            <div class="space-y-4">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Mot de passe</mat-label>
+                <input matInput
+                       [type]="hidePassword() ? 'password' : 'text'"
+                       formControlName="motDePasse"
+                       placeholder="Votre mot de passe">
+                <mat-icon matPrefix class="mr-2 text-gray-400">lock</mat-icon>
+                <button mat-icon-button
+                        matIconSuffix
+                        type="button"
+                        (click)="togglePasswordVisibility()">
+                  <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (inscriptionForm.get('securite.motDePasse')?.invalid && inscriptionForm.get('securite.motDePasse')?.touched) {
+                  <mat-error>{{ getErrorMessage('securite', 'motDePasse') }}</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Confirmer le mot de passe</mat-label>
+                <input matInput
+                       [type]="hideConfirmPassword() ? 'password' : 'text'"
+                       formControlName="confirmMotDePasse"
+                       placeholder="Confirmer votre mot de passe">
+                <mat-icon matPrefix class="mr-2 text-gray-400">lock</mat-icon>
+                <button mat-icon-button
+                        matIconSuffix
+                        type="button"
+                        (click)="toggleConfirmPasswordVisibility()">
+                  <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (inscriptionForm.get('securite.confirmMotDePasse')?.invalid && inscriptionForm.get('securite.confirmMotDePasse')?.touched) {
+                  <mat-error>{{ getErrorMessage('securite', 'confirmMotDePasse') }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <!-- Section géolocalisation -->
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h4 class="font-semibold text-blue-800 mb-3 flex items-center">
+                <mat-icon class="mr-2">location_on</mat-icon>
+                Localisation (optionnelle)
+              </h4>
+
+              <p class="text-sm text-blue-700 mb-4">
+                Partagez votre localisation pour recevoir des informations pertinentes sur votre quartier
+                (qualité de l'air, trafic, événements locaux).
+              </p>
+
+              @if (inscriptionForm.get('securite.latitude')?.value && inscriptionForm.get('securite.longitude')?.value) {
+                <div class="bg-green-100 p-3 rounded border border-green-300 mb-4">
+                  <div class="flex items-center text-green-800">
+                    <mat-icon class="mr-2 text-green-600">check_circle</mat-icon>
+                    <span class="font-medium">Localisation récupérée</span>
+                  </div>
+                  <p class="text-sm text-green-700 mt-1">
+                    Latitude: {{ inscriptionForm.get('securite.latitude')?.value }},
+                    Longitude: {{ inscriptionForm.get('securite.longitude')?.value }}
+                  </p>
+                </div>
+              }
+
+              @if (locationError()) {
+                <div class="bg-red-100 p-3 rounded border border-red-300 mb-4">
+                  <div class="flex items-center text-red-800">
+                    <mat-icon class="mr-2 text-red-600">error</mat-icon>
+                    <span class="font-medium">Erreur de localisation</span>
+                  </div>
+                  <p class="text-sm text-red-700">{{ locationError() }}</p>
+                </div>
+              }
+
+              <button type="button"
+                      mat-stroked-button
+                      color="primary"
+                      (click)="obtenirLocalisation()"
+                      [disabled]="locationLoading()"
+                      class="w-full">
+                @if (locationLoading()) {
+                  <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+                  <span>Récupération en cours...</span>
+                } @else {
+                  <mat-icon class="mr-2">my_location</mat-icon>
+                  <span>Obtenir ma localisation</span>
+                }
+              </button>
+
+              <mat-checkbox formControlName="accepterGeolocalisation"
+                            color="primary"
+                            class="mt-3">
+                J'accepte le partage de ma localisation
+              </mat-checkbox>
+            </div>
+
+            <!-- CGU -->
+            <mat-checkbox formControlName="accepterCGU"
+                          color="primary"
+                          class="w-full">
+              <span class="text-sm">
+                J'accepte les
+                <a href="/cgu" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                  conditions générales d'utilisation
+                </a>
+                et la
+                <a href="/privacy" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                  politique de confidentialité
+                </a>
+              </span>
+            </mat-checkbox>
+
+            @if (inscriptionForm.get('securite.accepterCGU')?.invalid && inscriptionForm.get('securite.accepterCGU')?.touched) {
+              <div class="text-red-600 text-sm mt-1">
+                Vous devez accepter les conditions générales d'utilisation
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Boutons de navigation -->
+        <div class="flex justify-between pt-6">
+          <!-- Bouton Précédent -->
+          @if (currentStep() > 0) {
+            <button type="button"
+                    mat-stroked-button
+                    color="primary"
+                    (click)="previousStep()"
+                    class="px-8">
+              <mat-icon class="mr-2">arrow_back</mat-icon>
+              Précédent
+            </button>
+          } @else {
+            <div></div>
+          }
+
+          <!-- Bouton Suivant/S'inscrire -->
+          @if (currentStep() < 2) {
+            <button type="button"
+                    mat-raised-button
+                    color="primary"
+                    (click)="nextStep()"
+                    class="px-8 btn-azure">
+              <span style="color: white">Suivant</span>
+              <mat-icon class="ml-2" style="color: white">arrow_forward</mat-icon>
+            </button>
+          } @else {
+            <button type="submit"
+                    mat-raised-button
+                    color="primary"
+                    class="px-8 btn-azure"
+                    [disabled]="isLoading() || !inscriptionForm.valid">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+                <span style="color: white">Inscription en cours...</span>
+              } @else {
+                <mat-icon class="mr-2" style="color: white">person_add</mat-icon>
+                <span style="color: white">S'inscrire</span>
+              }
+            </button>
+          }
+        </div>
+      </form>
+    </mat-card-content>
+
+    <!-- Footer de la card -->
+    <mat-card-actions class="text-center pt-4">
+      <div class="text-sm text-gray-600">
+        Déjà inscrit ?
+        <button type="button"
+                mat-button
+                color="primary"
+                (click)="onLogin()"
+                class="ml-1">
+          Se connecter
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+<!-- Footer -->
+<app-footer></app-footer>

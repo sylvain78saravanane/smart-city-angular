@@ -1,0 +1,311 @@
+/* =================================================================
+   PAGE D'ACCUEIL SIMPLE - SMART CITY IOT
+   ================================================================= */
+
+/* Section principale */
+.main-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+/* Fond simple */
+.simple-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+  z-index: 1;
+}
+
+/* Contenu principal */
+.content-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* =================================================================
+   TITRE PRINCIPAL
+   ================================================================= */
+.hero-title-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.hero-title-section.visible {
+  opacity: 1;
+}
+
+.main-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  color: #1e40af;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(30, 64, 175, 0.2);
+}
+
+.subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: #1e40af;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* =================================================================
+   SECTION DES NUAGES
+   ================================================================= */
+.clouds-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.cloud-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.cloud-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cloud-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.cloud-card:hover {
+  transform: translateY(-5px);
+}
+
+.cloud-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.cloud-icon mat-icon {
+  color: white;
+  font-size: 2rem;
+}
+
+.cloud-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.cloud-text {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* =================================================================
+   BOUTONS D'ACTION
+   ================================================================= */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.action-buttons.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.action-btn {
+  padding: 1rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  min-width: 200px !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+}
+
+.discover-btn {
+  background: linear-gradient(135deg, #3b82f6, #1e40af) !important;
+  color: white !important;
+}
+
+.discover-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  transform: translateY(-2px) !important;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #047857, #065f46) !important;
+  transform: translateY(-2px) !important;
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: white !important;
+}
+
+.register-btn:hover {
+  background: linear-gradient(135deg, #d97706, #b45309) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* =================================================================
+   RESPONSIVE DESIGN
+   ================================================================= */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 1rem;
+  }
+
+  .hero-title-section {
+    margin-bottom: 3rem;
+  }
+
+  .clouds-section {
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .cloud-card {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+
+  .cloud-title {
+    font-size: 1.3rem;
+  }
+
+  .cloud-text {
+    font-size: 0.95rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .action-btn {
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .cloud-card {
+    padding: 1.2rem;
+  }
+
+  .cloud-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .cloud-icon mat-icon {
+    font-size: 1.5rem;
+  }
+
+  .cloud-title {
+    font-size: 1.2rem;
+  }
+
+  .cloud-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* =================================================================
+   UTILITAIRES
+   ================================================================= */
+
+/* Animation simple d'apparition */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Classes d'espacement */
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+/* Classes de texte */
+.text-center {
+  text-align: center;
+}
+
+/* Classes flexbox */
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}

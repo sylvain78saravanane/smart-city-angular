@@ -9,7 +9,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {Header} from '../header/header';
 import {Footer} from '../footer/footer';
 import {AuthService} from '../services/auth.service';
@@ -44,6 +44,7 @@ export interface LoginResponse {
     MatCheckboxModule,
     Header,
     Footer,
+    RouterLink,
   ],
   templateUrl: './page-connexion.html',
   styleUrl: './page-connexion.css'
@@ -205,7 +206,7 @@ export class PageConnexion {
   }
 
   onRegister() {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/inscription']);
   }
 
   // Gestion d'erreur pour l'image

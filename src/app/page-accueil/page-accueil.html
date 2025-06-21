@@ -1,0 +1,80 @@
+<main class="main-section">
+
+  <!-- Fond simple -->
+  <div class="simple-background"></div>
+
+  <!-- Contenu principal -->
+  <div class="content-container">
+
+    <!-- Titre principal -->
+    <div class="hero-title-section" [class.visible]="heroVisible()">
+      <img src="./assets/images/logo_smartcity.png" alt="Smart City IoT Logo" class="w-96 h-96 object-contain">
+      <p class="subtitle">La ville intelligente de TechCity</p>
+    </div>
+
+    <!-- Les 3 nuages -->
+    <div class="clouds-section">
+
+      <!-- Nuage 1 -->
+      <div class="cloud-item" [class.visible]="clouds[0].visible">
+        <div class="cloud-card">
+          <div class="cloud-icon">
+            <mat-icon>{{clouds[0].icon}}</mat-icon>
+          </div>
+          <h2 class="cloud-title">{{clouds[0].title}}</h2>
+          <p class="cloud-text">{{clouds[0].content}}</p>
+        </div>
+      </div>
+
+      <!-- Nuage 2 -->
+      <div class="cloud-item" [class.visible]="clouds[1].visible">
+        <div class="cloud-card">
+          <div class="cloud-icon">
+            <mat-icon>{{clouds[1].icon}}</mat-icon>
+          </div>
+          <h2 class="cloud-title">{{clouds[1].title}}</h2>
+          <p class="cloud-text">{{clouds[1].content}}</p>
+        </div>
+      </div>
+
+      <!-- Nuage 3 -->
+      <div class="cloud-item" [class.visible]="clouds[2].visible">
+        <div class="cloud-card">
+          <div class="cloud-icon">
+            <mat-icon>{{clouds[2].icon}}</mat-icon>
+          </div>
+          <h2 class="cloud-title">{{clouds[2].title}}</h2>
+          <p class="cloud-text">{{clouds[2].content}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="action-buttons" [class.visible]="buttonsVisible()">
+
+      <button mat-raised-button
+              class="action-btn discover-btn"
+              (click)="onDiscoverSolution()">
+        <mat-icon>explore</mat-icon>
+        Découvrir la solution
+      </button>
+
+      <button mat-raised-button
+              class="action-btn login-btn"
+              (click)="onLogin()">
+        <mat-icon>login</mat-icon>
+        Se connecter
+      </button>
+
+      <button mat-raised-button
+              class="action-btn register-btn"
+              (click)="onRegisterCitoyen()">
+        <mat-icon>person_add</mat-icon>
+        S'inscrire en tant que Citoyen
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<app-footer></app-footer>

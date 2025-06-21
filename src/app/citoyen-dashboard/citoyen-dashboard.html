@@ -1,0 +1,178 @@
+<app-header></app-header>
+
+<!-- Container principal du dashboard -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
+  <div class="container mx-auto max-w-6xl">
+
+    <!-- En-tête de bienvenue -->
+    <div class="mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+              🏙️ Bienvenue {{ currentUser?.prenom }} !
+            </h1>
+            <p class="text-gray-600">
+              Découvrez les données IoT de votre ville en temps réel
+            </p>
+            <div class="mt-2 text-sm text-blue-600">
+              📍 {{ currentUser?.donneesSpecifiques?.latitude }}, {{ currentUser?.donneesSpecifiques?.longitude }}
+            </div>
+          </div>
+          <div class="text-right">
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="logout()"
+              class="mb-2">
+              <mat-icon class="mr-2">logout</mat-icon>
+              Se déconnecter
+            </button>
+            <div class="text-xs text-gray-500">
+              Connecté en tant que {{ currentUser?.role }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grille des fonctionnalités -->
+    <mat-grid-list cols="1" rowHeight="300px" gutterSize="16"
+                   [cols]="getGridCols()"
+                   class="mb-8">
+
+      <!-- Carte Qualité de l'Air -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-green-500 text-white">air</mat-icon>
+            <mat-card-title>Qualité de l'Air</mat-card-title>
+            <mat-card-subtitle>Données en temps réel</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-green-600 mb-2">Bonne</div>
+              <div class="text-sm text-gray-600 mb-4">PM2.5: 15 μg/m³</div>
+              <mat-progress-bar mode="determinate" value="75" color="primary"></mat-progress-bar>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary">Voir détails</button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Carte Température -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-orange-500 text-white">thermostat</mat-icon>
+            <mat-card-title>Température</mat-card-title>
+            <mat-card-subtitle>Conditions actuelles</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-orange-600 mb-2">22°C</div>
+              <div class="text-sm text-gray-600 mb-4">Ressentie: 24°C</div>
+              <mat-progress-bar mode="determinate" value="60" color="accent"></mat-progress-bar>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary">Historique</button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Carte Trafic -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-red-500 text-white">traffic</mat-icon>
+            <mat-card-title>Trafic</mat-card-title>
+            <mat-card-subtitle>État des routes</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-red-600 mb-2">Dense</div>
+              <div class="text-sm text-gray-600 mb-4">Délai: +15 min</div>
+              <mat-progress-bar mode="determinate" value="85" color="warn"></mat-progress-bar>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary">Itinéraires</button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Carte Mes Commentaires -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-purple-500 text-white">comment</mat-icon>
+            <mat-card-title>Mes Commentaires</mat-card-title>
+            <mat-card-subtitle>Participation citoyenne</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-purple-600 mb-2">3</div>
+              <div class="text-sm text-gray-600 mb-4">Commentaires publiés</div>
+              <button mat-raised-button color="primary" class="w-full">
+                <mat-icon class="mr-2">add</mat-icon>
+                Nouveau commentaire
+              </button>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary">Voir tous</button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+    </mat-grid-list>
+
+    <!-- Section Alertes Récentes -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <mat-icon class="mr-2 text-yellow-500">notifications</mat-icon>
+        Alertes Récentes
+      </h2>
+      <div class="space-y-3">
+        <div class="flex items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+          <mat-icon class="text-yellow-600 mr-3">warning</mat-icon>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800">Pic de pollution détecté</div>
+            <div class="text-sm text-gray-600">Zone: Centre-ville • Il y a 2h</div>
+          </div>
+        </div>
+        <div class="flex items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+          <mat-icon class="text-blue-600 mr-3">info</mat-icon>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800">Maintenance capteurs programmée</div>
+            <div class="text-sm text-gray-600">Secteur 3 • Demain 14h-16h</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Rapides -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-blue-500">location_on</mat-icon>
+        <span>Capteurs près de moi</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-green-500">analytics</mat-icon>
+        <span>Statistiques mensuelles</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-purple-500">help</mat-icon>
+        <span>Aide & Contact</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

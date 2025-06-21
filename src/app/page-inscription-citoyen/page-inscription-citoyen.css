@@ -1,0 +1,548 @@
+/* Styles spécifiques au composant d'inscription */
+
+/* Container principal */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Card d'inscription */
+.card-azure {
+  max-width: 48rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Animation d'entrée */
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Header de la card */
+mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 1.5rem;
+}
+
+/* Styles pour les champs de formulaire */
+mat-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  margin-bottom: 0.5rem;
+}
+
+/* Style pour les icônes dans les champs */
+mat-icon[matPrefix] {
+  margin-right: 0.5rem;
+  color: #6b7280;
+}
+
+/* Bouton principal */
+.btn-azure {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.5rem;
+  min-height: 3rem;
+}
+
+.btn-azure:hover:not(:disabled) {
+  box-shadow: 0 10px 25px -5px rgba(33, 150, 243, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-azure:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner de chargement */
+mat-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+/* Styles pour les erreurs */
+mat-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+}
+
+/* Indicateur de progression personnalisé */
+.progress-step {
+  transition: all 0.3s ease-in-out;
+}
+
+.progress-step.active {
+  background-color: #2196f3;
+  color: white;
+  border-color: #2196f3;
+}
+
+.progress-step.completed {
+  background-color: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+
+.progress-step.inactive {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  border-color: #d1d5db;
+}
+
+.progress-line {
+  transition: all 0.3s ease-in-out;
+}
+
+.progress-line.completed {
+  background-color: #2196f3;
+}
+
+/* Checkbox personnalisé */
+mat-checkbox {
+  font-size: 0.875rem;
+}
+
+.mat-mdc-checkbox {
+  margin-bottom: 0.5rem;
+}
+
+/* Liens et boutons secondaires */
+button[mat-button] {
+  font-size: 0.875rem;
+  transition: color 0.2s ease-in-out;
+}
+
+button[mat-button]:hover {
+  color: #1976d2;
+}
+
+/* Boutons d'étape */
+button[mat-stroked-button] {
+  border-color: #2196f3;
+  color: #2196f3;
+  transition: all 0.2s ease-in-out;
+}
+
+button[mat-stroked-button]:hover {
+  background-color: rgba(33, 150, 243, 0.04);
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+/* Zone d'information de géolocalisation */
+.geolocation-section {
+  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+/* Zones d'alerte */
+.alert-success {
+  background-color: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.alert-error {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.alert-info {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+/* Grille responsive */
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+/* Espacement */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Couleurs personnalisées */
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.text-blue-700 {
+  color: #1d4ed8;
+}
+
+.text-blue-800 {
+  color: #1e40af;
+}
+
+.text-green-600 {
+  color: #16a34a;
+}
+
+.text-green-700 {
+  color: #15803d;
+}
+
+.text-green-800 {
+  color: #166534;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-red-700 {
+  color: #b91c1c;
+}
+
+.text-red-800 {
+  color: #991b1b;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+.text-gray-800 {
+  color: #1f2937;
+}
+
+/* Backgrounds */
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.bg-blue-500 {
+  background-color: #3b82f6;
+}
+
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+/* Borders */
+.border-blue-200 {
+  border-color: #bfdbfe;
+}
+
+.border-green-300 {
+  border-color: #86efac;
+}
+
+.border-red-300 {
+  border-color: #fca5a5;
+}
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+/* Spacing utilities */
+.w-full {
+  width: 100%;
+}
+
+.w-10 {
+  width: 2.5rem;
+}
+
+.h-10 {
+  height: 2.5rem;
+}
+
+.h-1 {
+  height: 0.25rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.pt-4 {
+  padding-top: 1rem;
+}
+
+.pt-6 {
+  padding-top: 1.5rem;
+}
+
+.pb-6 {
+  padding-bottom: 1.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+/* Border radius */
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* Typography */
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+/* Hover effects */
+.hover\:text-blue-800:hover {
+  color: #1e40af;
+}
+
+/* Shadows */
+.shadow-azure {
+  box-shadow: 0 10px 25px -5px rgba(33, 150, 243, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .card-azure {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  mat-card-content {
+    padding: 1rem;
+  }
+
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Amélioration de l'accessibilité */
+button:focus {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Animation hover pour la card */
+.card-azure:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Transition douce pour tous les éléments interactifs */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Styles pour les étapes de validation */
+.step-indicator {
+  position: relative;
+  z-index: 1;
+}
+
+.step-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+  z-index: -1;
+}
+
+/* Animation de pulsation pour les éléments de chargement */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

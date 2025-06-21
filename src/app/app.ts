@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {Header} from './header/header';
-import {PageConnexion} from './page-connexion/page-connexion';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, PageConnexion],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
