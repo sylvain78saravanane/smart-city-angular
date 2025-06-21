@@ -1,1 +1,239 @@
-<p>mentions-legales works!</p>
+<!-- Header -->
+<app-header></app-header>
+
+<!-- Section principales des mentions légales -->
+<main class="legal-section">
+  <div class="container mx-auto px-6 py-12">
+
+    <!-- Header de la page -->
+    <div class="page-header text-center mb-12">
+      <h1 class="page-title">Mentions Légales</h1>
+      <p class="page-subtitle">Informations légales et conditions d'utilisation</p>
+    </div>
+
+    <!-- Navigation rapide -->
+    <div class="quick-nav mb-8">
+      <mat-card class="nav-card">
+        <div class="nav-content">
+          <h3 class="nav-title">Navigation rapide</h3>
+          <div class="nav-buttons">
+            <button mat-stroked-button color="primary" (click)="onContactUs()">
+              <mat-icon class="mr-2">contact_mail</mat-icon>
+              Nous contacter
+            </button>
+            <button mat-stroked-button color="primary" (click)="onPrivacyPolicy()">
+              <mat-icon class="mr-2">privacy_tip</mat-icon>
+              Politique de confidentialité
+            </button>
+            <button mat-stroked-button color="primary" (click)="onBackToHome()">
+              <mat-icon class="mr-2">home</mat-icon>
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="legal-content">
+
+      <!-- Informations de l'éditeur -->
+      <mat-card class="info-card mb-8">
+        <mat-card-header>
+          <mat-card-title>Informations sur l'éditeur</mat-card-title>
+          <mat-card-subtitle>Société éditrice du site Smart City IoT</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="company-details">
+            <div class="detail-grid">
+
+              <!-- Informations principales -->
+              <div class="detail-section">
+                <h4 class="detail-title">
+                  <mat-icon class="detail-icon">corporate_fare</mat-icon>
+                  Raison sociale
+                </h4>
+                <div class="detail-content">
+                  <p class="company-name">{{ companyInfo.name }}</p>
+                  <p class="legal-form">{{ companyInfo.legalForm }}</p>
+                  <p class="capital">Capital social : {{ companyInfo.capital }}</p>
+                </div>
+              </div>
+
+              <!-- Identifiants légaux -->
+              <div class="detail-section">
+                <h4 class="detail-title">
+                  <mat-icon class="detail-icon">badge</mat-icon>
+                  Identifiants légaux
+                </h4>
+                <div class="detail-content">
+                  <p><strong>SIRET :</strong> {{ companyInfo.siret }}</p>
+                  <p><strong>RCS :</strong> {{ companyInfo.rcs }}</p>
+                  <p><strong>TVA :</strong> {{ companyInfo.tva }}</p>
+                </div>
+              </div>
+
+              <!-- Adresse -->
+              <div class="detail-section">
+                <h4 class="detail-title">
+                  <mat-icon class="detail-icon">location_on</mat-icon>
+                  Siège social
+                </h4>
+                <div class="detail-content">
+                  <p>{{ companyInfo.address }}</p>
+                  <p>{{ companyInfo.city }}</p>
+                  <p>{{ companyInfo.country }}</p>
+                </div>
+              </div>
+
+              <!-- Contact -->
+              <div class="detail-section">
+                <h4 class="detail-title">
+                  <mat-icon class="detail-icon">contact_phone</mat-icon>
+                  Contact
+                </h4>
+                <div class="detail-content">
+                  <p>
+                    <mat-icon class="inline-icon">phone</mat-icon>
+                    <a href="tel:{{ companyInfo.phone }}">{{ companyInfo.phone }}</a>
+                  </p>
+                  <p>
+                    <mat-icon class="inline-icon">email</mat-icon>
+                    <a href="mailto:{{ companyInfo.email }}">{{ companyInfo.email }}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Équipe dirigeante -->
+      <mat-card class="team-card mb-8">
+        <mat-card-header>
+          <div mat-card-avatar class="team-avatar">
+            <mat-icon>people</mat-icon>
+          </div>
+          <mat-card-title>Direction et Responsabilités</mat-card-title>
+          <mat-card-subtitle>Équipe dirigeante de Smart City IoT</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="team-grid">
+            @for (member of management; track member.role) {
+              <div class="team-member">
+                <div class="member-role">{{ member.role }}</div>
+                <div class="member-name">{{ member.name }}</div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Prestataires techniques -->
+      <mat-card class="providers-card mb-8">
+        <mat-card-header>
+          <div mat-card-avatar class="tech-avatar">
+            <mat-icon>cloud</mat-icon>
+          </div>
+          <mat-card-title>Prestataires Techniques</mat-card-title>
+          <mat-card-subtitle>Hébergement et développement</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="providers-grid">
+
+            <!-- Hébergement -->
+            <div class="provider-section">
+              <h4 class="provider-title">
+                <mat-icon class="provider-icon">dns</mat-icon>
+                Hébergement
+              </h4>
+              <div class="provider-details">
+                <p class="provider-name">{{ providers.hosting.name }}</p>
+                <p class="provider-address">{{ providers.hosting.address }}</p>
+                <p class="provider-contact">
+                  <mat-icon class="inline-icon">phone</mat-icon>
+                  {{ providers.hosting.phone }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Développement -->
+            <div class="provider-section">
+              <h4 class="provider-title">
+                <mat-icon class="provider-icon">code</mat-icon>
+                Développement
+              </h4>
+              <div class="provider-details">
+                <p class="provider-name">{{ providers.development.name }}</p>
+                <p class="provider-contact">
+                  <mat-icon class="inline-icon">email</mat-icon>
+                  <a href="mailto:{{ providers.development.contact }}">{{ providers.development.contact }}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Sections légales détaillées -->
+      <div class="legal-sections">
+        <h2 class="sections-title">Conditions Légales Détaillées</h2>
+
+        <mat-accordion class="legal-accordion">
+          @for (section of legalSections; track section.title) {
+            <mat-expansion-panel class="legal-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="section-icon">{{ section.icon }}</mat-icon>
+                  {{ section.title }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="section-content">
+                @for (paragraph of section.content; track paragraph) {
+                  <p class="section-paragraph">{{ paragraph }}</p>
+                }
+              </div>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+      </div>
+
+      <!-- Note importante -->
+      <mat-card class="important-note mt-8">
+        <div class="note-content">
+          <mat-icon class="note-icon">info</mat-icon>
+          <div class="note-text">
+            <h4 class="note-title">Information importante</h4>
+            <p class="note-description">
+              Ces mentions légales peuvent être modifiées à tout moment.
+              Nous vous recommandons de les consulter régulièrement.
+              Pour toute question concernant ces mentions légales,
+              n'hésitez pas à nous contacter.
+            </p>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Actions finales -->
+      <div class="final-actions text-center mt-8">
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" (click)="onContactUs()">
+            <mat-icon class="mr-2">contact_support</mat-icon>
+            Une question ? Contactez-nous
+          </button>
+          <button mat-stroked-button color="primary" (click)="onBackToHome()">
+            <mat-icon class="mr-2">arrow_back</mat-icon>
+            Retour à l'accueil
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<app-footer></app-footer>

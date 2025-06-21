@@ -1,0 +1,713 @@
+/* =================================================================
+   MENTIONS LÉGALES - STYLES
+   ================================================================= */
+
+/* Section principale */
+.legal-section {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  padding: 2rem 0;
+}
+
+/* Header de la page */
+.page-header {
+  margin-bottom: 3rem;
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #1e40af;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(30, 64, 175, 0.1);
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+.update-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  margin: 0 auto;
+  max-width: fit-content;
+}
+
+.update-icon {
+  color: #3b82f6;
+  font-size: 1.2rem !important;
+}
+
+.update-text {
+  color: #1e40af;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* =================================================================
+   NAVIGATION RAPIDE
+   ================================================================= */
+.quick-nav {
+  margin-bottom: 2rem;
+}
+
+.nav-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.nav-content {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.nav-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-buttons button {
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  min-width: 160px;
+}
+
+/* =================================================================
+   CARTES D'INFORMATION
+   ================================================================= */
+.info-card,
+.team-card,
+.providers-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  overflow: hidden;
+}
+
+/* Avatars des cartes */
+.company-avatar {
+  background: linear-gradient(135deg, #3b82f6, #1e40af) !important;
+  color: white !important;
+}
+
+.team-avatar {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+}
+
+.tech-avatar {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: white !important;
+}
+
+/* =================================================================
+   DÉTAILS DE L'ENTREPRISE
+   ================================================================= */
+.company-details {
+  padding: 1rem 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.detail-section {
+  background: rgba(59, 130, 246, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.detail-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 1rem;
+}
+
+.detail-icon {
+  color: #3b82f6;
+  font-size: 1.3rem !important;
+}
+
+.detail-content p {
+  margin: 0.5rem 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.company-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.legal-form {
+  font-style: italic;
+  color: #6b7280;
+}
+
+.capital {
+  font-weight: 500;
+}
+
+.inline-icon {
+  font-size: 1rem !important;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  color: #3b82f6;
+}
+
+/* Liens */
+a {
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+/* =================================================================
+   ÉQUIPE DIRIGEANTE
+   ================================================================= */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.team-member {
+  background: rgba(16, 185, 129, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  text-align: center;
+}
+
+.member-role {
+  font-size: 0.9rem;
+  color: #059669;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.member-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.member-title {
+  font-size: 0.95rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* =================================================================
+   PRESTATAIRES TECHNIQUES
+   ================================================================= */
+.providers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.provider-section {
+  background: rgba(245, 158, 11, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.provider-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #d97706;
+  margin-bottom: 1rem;
+}
+
+.provider-icon {
+  color: #f59e0b;
+  font-size: 1.3rem !important;
+}
+
+.provider-details p {
+  margin: 0.5rem 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.provider-name {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 1.05rem;
+}
+
+.provider-address {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.provider-contact {
+  display: flex;
+  align-items: center;
+}
+
+/* =================================================================
+   SECTIONS LÉGALES DÉTAILLÉES
+   ================================================================= */
+.legal-sections {
+  margin: 3rem 0;
+}
+
+.sections-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.legal-accordion {
+  background: transparent;
+}
+
+.legal-panel {
+  background: white !important;
+  border-radius: 12px !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(59, 130, 246, 0.1) !important;
+  overflow: hidden !important;
+}
+
+.legal-panel .mat-expansion-panel-header {
+  background: rgba(59, 130, 246, 0.05) !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1rem 1.5rem !important;
+}
+
+.legal-panel.mat-expanded .mat-expansion-panel-header {
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.section-icon {
+  color: #3b82f6;
+  font-size: 1.3rem !important;
+  margin-right: 0.75rem;
+}
+
+.mat-panel-title {
+  font-weight: 600 !important;
+  color: #1e40af !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.section-content {
+  padding: 1.5rem;
+  background: white;
+}
+
+.section-paragraph {
+  margin: 1rem 0;
+  color: #374151;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+.section-paragraph:first-child {
+  margin-top: 0;
+}
+
+.section-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* =================================================================
+   NOTE IMPORTANTE
+   ================================================================= */
+.important-note {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.note-content {
+  padding: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.note-icon {
+  color: #d97706;
+  font-size: 2rem !important;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.note-text {
+  flex: 1;
+}
+
+.note-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.note-description {
+  color: #92400e;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* =================================================================
+   ACTIONS FINALES
+   ================================================================= */
+.final-actions {
+  margin-top: 3rem;
+  padding: 2rem 0;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  padding: 1rem 2rem !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  min-width: 200px;
+}
+
+/* =================================================================
+   RESPONSIVE DESIGN
+   ================================================================= */
+@media (max-width: 1024px) {
+  .detail-grid,
+  .team-grid,
+  .providers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-buttons button {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .detail-section,
+  .team-member,
+  .provider-section {
+    padding: 1rem;
+  }
+
+  .note-content {
+    padding: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .note-icon {
+    align-self: center;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .update-info {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+  }
+
+  .nav-content {
+    padding: 1rem;
+  }
+
+  .nav-title {
+    font-size: 1.1rem;
+  }
+
+  .detail-section,
+  .team-member,
+  .provider-section {
+    padding: 0.75rem;
+  }
+
+  .note-content {
+    padding: 1rem;
+  }
+
+  .note-title {
+    font-size: 1.1rem;
+  }
+
+  .sections-title {
+    font-size: 1.5rem;
+  }
+
+  .legal-panel .mat-expansion-panel-header {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .section-content {
+    padding: 1rem;
+  }
+
+  .mat-panel-title {
+    font-size: 0.95rem !important;
+  }
+
+  .section-icon {
+    font-size: 1.1rem !important;
+    margin-right: 0.5rem;
+  }
+}
+
+/* =================================================================
+   UTILITAIRES ET CLASSES HELPER
+   ================================================================= */
+
+/* Classes d'espacement */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container { max-width: 640px; }
+}
+
+@media (min-width: 768px) {
+  .container { max-width: 768px; }
+}
+
+@media (min-width: 1024px) {
+  .container { max-width: 1024px; }
+}
+
+@media (min-width: 1280px) {
+  .container { max-width: 1280px; }
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mb-12 {
+  margin-bottom: 3rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Classes de couleurs personnalisées */
+.text-primary {
+  color: #3b82f6;
+}
+
+.text-secondary {
+  color: #6b7280;
+}
+
+.bg-primary-light {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Animations et transitions */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects */
+.hover-shadow:hover {
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* États focus pour l'accessibilité */
+button:focus,
+a:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Print styles */
+@media print {
+  .nav-card,
+  .final-actions,
+  button {
+    display: none;
+  }
+
+  .legal-panel {
+    page-break-inside: avoid;
+  }
+
+  .page-title {
+    color: black;
+    text-shadow: none;
+  }
+
+  .legal-section {
+    background: white;
+  }
+
+  .info-card,
+  .team-card,
+  .providers-card,
+  .important-note {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
+
+/* Améliorations pour l'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .detail-section,
+  .team-member,
+  .provider-section {
+    border: 2px solid #000;
+  }
+
+  .text-primary,
+  .detail-icon,
+  .section-icon {
+    color: #000;
+  }
+
+  .important-note {
+    border: 2px solid #000;
+    background: #fff;
+  }
+}

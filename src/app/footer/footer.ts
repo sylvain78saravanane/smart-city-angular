@@ -37,8 +37,7 @@ export class Footer {
   // Liens de navigation du footer
   navigationLinks = [
     { label: 'Accueil', route: '/', icon: 'home' },
-    { label: 'À propos', route: '/about', icon: 'info' },
-    { label: 'Contact', route: '/contact', icon: 'contact_mail' }
+    { label: 'Contact', route: '/plan', icon: 'contact_mail' }
   ];
 
   // Liens légaux
@@ -46,7 +45,7 @@ export class Footer {
     { label: 'Mentions légales', route: '/mentions-legales' },
     { label: 'Politique de confidentialité', route: '/privacy' },
     { label: 'Conditions d\'utilisation', route: '/terms' },
-    { label: 'Plan du site', route: '/sitemap' }
+    { label: 'Plan du site', route: '/plan' }
   ];
 
   // Réseaux sociaux

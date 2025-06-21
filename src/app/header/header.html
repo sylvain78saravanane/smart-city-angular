@@ -1,3 +1,5 @@
+<!-- src/app/header/header.html - Ajout du lien administrateur -->
+
 <!-- Header Principal -->
 <mat-toolbar class="navbar-azure shadow-lg">
   <div class="w-full flex items-center justify-between">
@@ -66,19 +68,45 @@
 
         <div class="border-t border-gray-200 my-4"></div>
 
-        <a
-          routerLink="/login"
-          class="flex items-center p-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200"
-          (click)="onMenuItemClick()">
-          <mat-icon class="mr-3">login</mat-icon>
-          <span class="font-medium">Se connecter</span>
-        </a>
+        <!-- Section Connexions -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide px-3">
+            Connexion
+          </h3>
+
+          <a
+            routerLink="/login"
+            class="flex items-center p-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200"
+            (click)="onMenuItemClick()">
+            <mat-icon class="mr-3">login</mat-icon>
+            <span class="font-medium">Se connecter (Citoyen)</span>
+          </a>
+
+          <!-- Lien Administrateur avec style spécial -->
+          <a
+            routerLink="/admin/login"
+            class="flex items-center p-3 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-200 border-2 border-red-600"
+            (click)="onMenuItemClick()">
+            <mat-icon class="mr-3">admin_panel_settings</mat-icon>
+            <div class="flex flex-col">
+              <span class="font-medium">Accès Administrateur</span>
+              <span class="text-xs opacity-90">Zone sécurisée</span>
+            </div>
+          </a>
+        </div>
       </nav>
 
       <!-- Footer du menu mobile -->
       <div class="absolute bottom-4 left-4 right-4 text-center">
-        <p class="text-sm text-gray-500">Smart City IoT v1.0</p>
-        <p class="text-xs text-gray-400">Connectons notre ville</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-sm text-gray-600 font-medium">Smart City IoT v1.0</p>
+          <p class="text-xs text-gray-400">Connectons notre ville</p>
+          <!-- Badge sécurité -->
+          <div class="flex items-center justify-center mt-2 space-x-2">
+            <mat-icon class="text-green-500 text-sm">security</mat-icon>
+            <span class="text-xs text-gray-500">Connexion sécurisée</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -1,0 +1,158 @@
+<!-- Header -->
+<app-header></app-header>
+
+<!-- Section principale du plan -->
+<main class="plan-section">
+  <div class="container mx-auto px-6 py-12">
+
+    <!-- Titre de la page -->
+    <div class="page-header text-center mb-12">
+      <h1 class="page-title">Plan d'Accès</h1>
+      <p class="page-subtitle">Trouvez facilement nos locaux Smart City IoT</p>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="plan-content">
+
+      <!-- Carte principale -->
+      <mat-card class="plan-card">
+        <div class="plan-layout">
+
+          <!-- Image du plan à gauche -->
+          <div class="plan-image-section">
+            <div class="image-container">
+              <img
+                src="./assets/images/plan.png"
+                alt="Plan d'accès Smart City IoT TechCity"
+                class="plan-image"
+                (error)="onImageError($event)">
+
+              <!-- Placeholder en cas d'erreur -->
+              <div class="image-placeholder" style="display: none;">
+                <mat-icon class="placeholder-icon">map</mat-icon>
+                <p class="placeholder-text">Plan non disponible</p>
+              </div>
+            </div>
+
+            <!-- Boutons d'action pour la carte -->
+            <div class="map-actions">
+              <button mat-raised-button
+                      color="primary"
+                      class="action-button"
+                      (click)="onOpenMaps()">
+                <mat-icon class="mr-2">map</mat-icon>
+                Voir sur Google Maps
+              </button>
+
+              <button mat-stroked-button
+                      color="primary"
+                      class="action-button"
+                      (click)="onGetDirections()">
+                <mat-icon class="mr-2">directions</mat-icon>
+                Itinéraire
+              </button>
+            </div>
+          </div>
+
+          <!-- Informations à droite -->
+          <div class="plan-info-section">
+
+            <!-- Adresse principale -->
+            <div class="location-header">
+              <h2 class="location-title">{{ locationInfo.title }}</h2>
+            </div>
+
+            <mat-divider class="section-divider"></mat-divider>
+
+            <!-- Détails de contact -->
+            <div class="contact-section">
+              <h3 class="section-title">Informations de Contact</h3>
+
+              <div class="contact-list">
+                @for (contact of contactDetails; track contact.label) {
+                  <div class="contact-item"
+                       [class.clickable]="contact.link"
+                       (click)="onContactAction(contact)">
+                    <div class="contact-icon-container">
+                      <mat-icon class="contact-icon">{{ contact.icon }}</mat-icon>
+                    </div>
+                    <div class="contact-content">
+                      <span class="contact-label">{{ contact.label }}</span>
+                      <span class="contact-value">{{ contact.value }}</span>
+                    </div>
+                    @if (contact.link) {
+                      <mat-icon class="action-icon">open_in_new</mat-icon>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <mat-divider class="section-divider"></mat-divider>
+
+            <!-- Informations pratiques -->
+            <div class="practical-section">
+              <h3 class="section-title">Informations Pratiques</h3>
+
+              <div class="practical-list">
+                @for (info of practicalInfo; track info.title) {
+                  <div class="practical-item">
+                    <div class="practical-icon-container">
+                      <mat-icon class="practical-icon">{{ info.icon }}</mat-icon>
+                    </div>
+                    <div class="practical-content">
+                      <span class="practical-title">{{ info.title }}</span>
+                      <span class="practical-description">{{ info.description }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Note importante -->
+            <div class="important-note">
+              <mat-icon class="note-icon">info</mat-icon>
+              <p class="note-text">
+                <strong>Note :</strong> Pour toute visite, merci de nous contacter au préalable
+                pour confirmer votre rendez-vous et faciliter votre accueil.
+              </p>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Section contact rapide -->
+    <div class="quick-contact-section">
+      <mat-card class="quick-contact-card">
+        <div class="quick-contact-content">
+          <div class="quick-contact-header">
+            <mat-icon class="quick-contact-icon">contact_support</mat-icon>
+            <h3 class="quick-contact-title">Besoin d'aide pour nous trouver ?</h3>
+          </div>
+          <p class="quick-contact-text">
+            Notre équipe est disponible pour vous aider à planifier votre visite
+            et répondre à toutes vos questions.
+          </p>
+          <div class="quick-contact-actions">
+            <button mat-raised-button
+                    color="primary"
+                    (click)="onContactAction(contactDetails[1])">
+              <mat-icon class="mr-2">phone</mat-icon>
+              Appeler
+            </button>
+            <button mat-stroked-button
+                    color="primary"
+                    (click)="onContactAction(contactDetails[2])">
+              <mat-icon class="mr-2" style="color: white">email</mat-icon>
+              <p style="color: white">Envoyer un email</p>
+            </button>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<app-footer></app-footer>

@@ -1,0 +1,183 @@
+<!-- src/app/page-connexion-admin/page-connexion-admin.html -->
+<app-header></app-header>
+
+<!-- Container principal avec fond gradient -->
+<div class="min-h-screen gradient-azure-sky flex items-center justify-center p-4">
+
+  <!-- Card de connexion administrateur -->
+  <mat-card class="w-full max-w-md card-azure fade-in-up">
+    <mat-card-header class="text-center pb-6">
+      <!-- Logo et titre -->
+      <div>
+        <img src="./assets/images/logo_smartcity.png" alt="Smart City IoT Logo" class="w-48 h-48 object-contain">
+      </div>
+
+      <div class="flex flex-col items-center space-y-4 w-full">
+        <!-- Badge administrateur -->
+        <div class="bg-red-500 text-white px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg">
+          <mat-icon class="text-white">admin_panel_settings</mat-icon>
+          <span class="font-semibold text-sm">ACCÈS ADMINISTRATEUR</span>
+        </div>
+
+        <div>
+          <mat-card-title class="text-2xl font-bold text-gray-800 mb-2">
+            Connexion Administrateur
+          </mat-card-title>
+          <mat-card-subtitle class="text-gray-600">
+            Accès sécurisé au panneau d'administration
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Avertissement sécurité -->
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
+        <div class="flex items-center space-x-2">
+          <mat-icon class="text-amber-600">security</mat-icon>
+          <span class="text-amber-800 text-sm font-medium">Zone sécurisée</span>
+        </div>
+        <p class="text-amber-700 text-xs mt-1">
+          Accès réservé aux administrateurs système uniquement
+        </p>
+      </div>
+
+      <!-- Formulaire de connexion -->
+      <form [formGroup]="adminLoginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <!-- Champ Email -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email administrateur</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="admin@smartcityiot.fr"
+            autocomplete="email">
+          <mat-icon matPrefix class="mr-2 text-gray-400">admin_panel_settings</mat-icon>
+          @if (adminLoginForm.get('email')?.invalid && adminLoginForm.get('email')?.touched) {
+            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Champ Mot de passe -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Mot de passe</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="motDePasse"
+            placeholder="Votre mot de passe"
+            autocomplete="current-password">
+          <mat-icon matPrefix class="mr-2 text-gray-400">lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Toggle password visibility'"
+            [attr.aria-pressed]="hidePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (adminLoginForm.get('motDePasse')?.invalid && adminLoginForm.get('motDePasse')?.touched) {
+            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Champ Code Administrateur (4 chiffres) -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Code administrateur</mat-label>
+          <input
+            matInput
+            [type]="hideCodeAdmin() ? 'password' : 'text'"
+            formControlName="codeAdmin"
+            placeholder="1234"
+            maxlength="4"
+            pattern="[0-9]*"
+            inputmode="numeric"
+            (input)="onCodeAdminInput($event)"
+            autocomplete="off">
+          <mat-icon matPrefix class="mr-2 text-gray-400">vpn_key</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="toggleCodeAdminVisibility()"
+            [attr.aria-label]="'Toggle code visibility'"
+            [attr.aria-pressed]="hideCodeAdmin()">
+            <mat-icon>{{ hideCodeAdmin() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (adminLoginForm.get('codeAdmin')?.invalid && adminLoginForm.get('codeAdmin')?.touched) {
+            <mat-error>{{ getCodeAdminErrorMessage() }}</mat-error>
+          }
+          <mat-hint>4 chiffres requis</mat-hint>
+        </mat-form-field>
+
+        <!-- Options -->
+        <div class="flex items-center justify-between">
+          <mat-checkbox formControlName="rememberMe" color="primary">
+            Se souvenir de moi
+          </mat-checkbox>
+
+          <button
+            type="button"
+            mat-button
+            color="primary"
+            class="text-sm"
+            (click)="onForgotPassword()">
+            Accès oublié ?
+          </button>
+        </div>
+
+        <!-- Bouton de connexion -->
+        <div style="display: flex; justify-content: center">
+          <button
+            style="width: 15pc;"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="w-full h-12 btn-azure text-lg font-medium"
+            [disabled]="isLoading()">
+
+            @if (isLoading()) {
+              <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+              <span>Vérification en cours...</span>
+            } @else {
+              <mat-icon class="mr-2" style="color: white">admin_panel_settings</mat-icon>
+              <span style="color: white">Accès Administrateur</span>
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <!-- Footer de la card -->
+    <div style="display: flex; justify-content: center">
+      <mat-card-actions class="flex flex-col space-y-3 pt-4">
+        <!-- Séparateur -->
+        <div class="w-full border-t border-gray-200"></div>
+
+        <!-- Bouton retour -->
+        <button
+          style="width: 15pc; margin-bottom: 1pc"
+          mat-stroked-button
+          color="accent"
+          class="w-full h-11"
+          (click)="onReturnToLogin()">
+          <mat-icon class="mr-2">arrow_back</mat-icon>
+          Connexion Citoyen
+        </button>
+      </mat-card-actions>
+    </div>
+
+    <!-- Informations de contact d'urgence -->
+    <div class="bg-gray-50 p-3 rounded-b-lg">
+      <p class="text-xs text-gray-600 text-center">
+        <mat-icon class="text-gray-500 mr-1" style="font-size: 14px;">support</mat-icon>
+        Support technique : supportsmartcityiot.fr
+      </p>
+    </div>
+  </mat-card>
+</div>
+
+<app-footer></app-footer>
