@@ -10,13 +10,11 @@ export interface LoginRequest {
   mot_de_passe: string;
 }
 
-export interface AdminLoginRequest {
-  email: string;
-  mot_de_passe: string;
+export interface AdminLoginRequest extends LoginRequest {
   code_admin: string;
 }
 
-// Interface mise à jour pour les données spécifiques
+
 export interface DonneesSpecifiques {
   // Pour les citoyens
   latitude?: number;
