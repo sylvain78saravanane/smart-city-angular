@@ -9,6 +9,7 @@ import {MentionsLegales} from './mentions-legales/mentions-legales';
 import {PageConnexionAdmin} from './page-connexion-admin/page-connexion-admin';
 import {AdminDashboard} from './admin-dashboard/admin-dashboard';
 import {PageConnexionChercheur} from './page-connexion-chercheur/page-connexion-chercheur';
+import {ErrorPage} from './error-page/error-page';
 
 export const routes: Routes = [
   {path:'login', component: PageConnexion},
