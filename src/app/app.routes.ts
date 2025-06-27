@@ -8,6 +8,7 @@ import {PagePlan} from './page-plan/page-plan';
 import {MentionsLegales} from './mentions-legales/mentions-legales';
 import {PageConnexionAdmin} from './page-connexion-admin/page-connexion-admin';
 import {AdminDashboard} from './admin-dashboard/admin-dashboard';
+import {PageConnexionChercheur} from './page-connexion-chercheur/page-connexion-chercheur';
 
 export const routes: Routes = [
   {path:'login', component: PageConnexion},
@@ -18,4 +19,6 @@ export const routes: Routes = [
   {path: 'mentions-legales', component: MentionsLegales},
   {path: 'login/administrateur', component: PageConnexionAdmin},
   {path: 'dashboard/administrateur', component: AdminDashboard},
+  {path: 'login/chercheur', component : PageConnexionChercheur},
+  {path: '**', component : ErrorPage},
 ];

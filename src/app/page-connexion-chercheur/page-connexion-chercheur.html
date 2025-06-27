@@ -1,0 +1,158 @@
+<!-- src/app/page-connexion-chercheur/page-connexion-chercheur.html -->
+<app-header></app-header>
+
+<!-- Container principal avec fond gradient -->
+<div class="min-h-screen gradient-azure-sky flex items-center justify-center p-4">
+
+  <!-- Card de connexion chercheur -->
+  <mat-card class="w-full max-w-md card-azure fade-in-up">
+    <mat-card-header class="text-center pb-6">
+      <!-- Logo et titre -->
+      <div>
+        <img src="./assets/images/logo_smartcity.png" alt="Smart City IoT Logo" class="w-48 h-48 object-contain">
+      </div>
+
+      <div class="flex flex-col items-center space-y-4 w-full">
+        <!-- Badge chercheur -->
+        <div class="bg-purple-500 text-white px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg">
+          <mat-icon class="text-white">school</mat-icon>
+          <span class="font-semibold text-sm">ACCÈS CHERCHEUR</span>
+        </div>
+
+        <div>
+          <mat-card-title class="text-2xl font-bold text-gray-800 mb-2">
+            Connexion Chercheur
+          </mat-card-title>
+          <mat-card-subtitle class="text-gray-600">
+            Accès à l'espace de recherche et d'analyse
+          </mat-card-subtitle>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Zone d'information recherche -->
+      <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-6">
+        <div class="flex items-center space-x-2">
+          <mat-icon class="text-purple-600">science</mat-icon>
+          <span class="text-purple-800 text-sm font-medium">Espace de recherche</span>
+        </div>
+        <p class="text-purple-700 text-xs mt-1">
+          Accès aux données IoT pour vos travaux de recherche
+        </p>
+      </div>
+
+      <!-- Formulaire de connexion -->
+      <form [formGroup]="chercheurLoginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <!-- Champ Email -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email institutionnel</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="prenom.nom@institut.edu"
+            autocomplete="email">
+          <mat-icon matPrefix class="mr-2 text-gray-400">school</mat-icon>
+          @if (chercheurLoginForm.get('email')?.invalid && chercheurLoginForm.get('email')?.touched) {
+            <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+          }
+          <mat-hint>Utilisez votre email institutionnel</mat-hint>
+        </mat-form-field>
+
+        <!-- Champ Mot de passe -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Mot de passe</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="motDePasse"
+            placeholder="Votre mot de passe"
+            autocomplete="current-password">
+          <mat-icon matPrefix class="mr-2 text-gray-400">lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Toggle password visibility'"
+            [attr.aria-pressed]="hidePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (chercheurLoginForm.get('motDePasse')?.invalid && chercheurLoginForm.get('motDePasse')?.touched) {
+            <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Options -->
+        <div class="flex items-center justify-between">
+          <mat-checkbox formControlName="rememberMe" color="primary">
+            Se souvenir de moi
+          </mat-checkbox>
+
+          <button
+            type="button"
+            mat-button
+            color="primary"
+            class="text-sm"
+            (click)="onForgotPassword()">
+            Mot de passe oublié ?
+          </button>
+        </div>
+
+        <!-- Bouton de connexion -->
+        <div style="display: flex; justify-content: center">
+          <button
+            style="width: 15pc;"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="w-full h-12 btn-azure text-lg font-medium"
+            [disabled]="isLoading()">
+
+            @if (isLoading()) {
+              <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+              <span>Vérification en cours...</span>
+            } @else {
+              <mat-icon class="mr-2" style="color: white">science</mat-icon>
+              <span style="color: white">Accès Recherche</span>
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <!-- Footer de la card -->
+    <div style="display: flex; justify-content: center">
+      <mat-card-actions class="flex flex-col space-y-3 pt-4">
+        <!-- Séparateur -->
+        <div class="w-full border-t border-gray-200"></div>
+
+        <!-- Boutons de navigation -->
+        <div class="flex flex-col space-y-2 w-full">
+          <button
+            style="width: 15pc;"
+            mat-stroked-button
+            color="accent"
+            class="w-full h-11"
+            (click)="onReturnToLogin()">
+            <mat-icon class="mr-2">arrow_back</mat-icon>
+            Connexion Citoyen
+          </button>
+
+          <button
+            style="width: 15pc; margin-bottom: 1pc"
+            mat-button
+            class="w-full h-10 text-purple-600 hover:bg-purple-50"
+            (click)="onAccessRequest()">
+            <mat-icon class="mr-2">contact_mail</mat-icon>
+            <span class="text-sm">Demander un accès</span>
+          </button>
+        </div>
+      </mat-card-actions>
+    </div>
+  </mat-card>
+</div>
+
+<app-footer></app-footer>
