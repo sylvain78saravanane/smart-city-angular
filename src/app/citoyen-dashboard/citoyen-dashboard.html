@@ -1,3 +1,5 @@
+<!-- src/app/citoyen-dashboard/citoyen-dashboard.html - Version mise à jour avec données temps réel -->
+
 <app-header></app-header>
 
 <!-- Container principal du dashboard -->
@@ -13,10 +15,32 @@
               🏙️ Bienvenue {{ currentUser?.prenom }} !
             </h1>
             <p class="text-gray-600">
-              Découvrez les données IoT de Tech City en temps réel
+              Découvrez les données IoT de Tech City ({{ donneeEnTempsReel?.villeNom || 'Paris' }}) en temps réel
             </p>
             <div class="mt-2 text-sm text-blue-600">
               📍 {{ currentUser?.donneesSpecifiques?.latitude }}, {{ currentUser?.donneesSpecifiques?.longitude }}
+            </div>
+
+            <!-- Indicateur de dernière mise à jour -->
+            <div class="mt-3 flex items-center space-x-4">
+              <div class="flex items-center space-x-2 text-sm">
+                <mat-icon [class]="isLoading ? 'animate-spin text-blue-500' : 'text-green-500'" class="text-sm">
+                  {{ isLoading ? 'refresh' : 'check_circle' }}
+                </mat-icon>
+                <span [class]="isLoading ? 'text-blue-600' : 'text-green-600'">
+                  {{ isLoading ? 'Mise à jour en cours...' : 'Dernière mise à jour: ' + getLastUpdateString() }}
+                </span>
+              </div>
+
+              <!-- Bouton de rafraîchissement manuel -->
+              <button
+                mat-icon-button
+                (click)="refreshData()"
+                [disabled]="isLoading"
+                class="text-blue-500"
+                title="Rafraîchir manuellement">
+                <mat-icon [class]="isLoading ? 'animate-spin' : ''">refresh</mat-icon>
+              </button>
             </div>
           </div>
           <div class="text-right">
@@ -36,8 +60,21 @@
       </div>
     </div>
 
-    <!-- Grille des fonctionnalités -->
-    <mat-grid-list cols="1" rowHeight="300px" gutterSize="16"
+    <!-- Message d'erreur si pas de données -->
+    @if (error && !isLoading) {
+      <div class="mb-8 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+        <div class="flex items-center">
+          <mat-icon class="text-red-400 mr-3">error</mat-icon>
+          <div>
+            <h3 class="font-medium text-red-800">Données indisponibles</h3>
+            <p class="text-red-700 text-sm mt-1">{{ error }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Grille des données IoT en temps réel -->
+    <mat-grid-list cols="1" rowHeight="320px" gutterSize="16"
                    [cols]="getGridCols()"
                    class="mb-8">
 
@@ -45,16 +82,42 @@
       <mat-grid-tile>
         <mat-card class="w-full h-full hover-azure">
           <mat-card-header>
-            <mat-icon mat-card-avatar class="bg-green-500 text-white">air</mat-icon>
+            <mat-icon
+              mat-card-avatar
+              [style.background-color]="getQualiteAirColor()"
+              class="text-white">
+              air
+            </mat-icon>
             <mat-card-title>Qualité de l'Air</mat-card-title>
-            <mat-card-subtitle>Données en temps réel</mat-card-subtitle>
+            <mat-card-subtitle>Tech City - Temps réel</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content class="flex-1 flex flex-col justify-center">
-            <div class="text-center">
-              <div class="text-4xl font-bold text-green-600 mb-2">Bonne</div>
-              <div class="text-sm text-gray-600 mb-4">PM2.5: 15 μg/m³</div>
-              <mat-progress-bar mode="determinate" value="75" color="primary"></mat-progress-bar>
-            </div>
+            @if (isLoading) {
+              <div class="text-center">
+                <mat-icon class="animate-spin text-4xl text-blue-500 mb-4">refresh</mat-icon>
+                <div class="text-gray-600">Chargement...</div>
+              </div>
+            } @else if (donneeEnTempsReel) {
+              <div class="text-center">
+                <div class="text-4xl font-bold mb-2" [style.color]="getQualiteAirColor()">
+                  {{ donneeEnTempsReel.qualiteAirResume }}
+                </div>
+                <div class="text-sm text-gray-600 mb-4">
+                  PM10: {{ donneeEnTempsReel.pm10 | number:'1.1-1' }} μg/m³<br>
+                  CO: {{ donneeEnTempsReel.co | number:'1.1-1' }} mg/m³
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getQualiteAirProgress()"
+                  [color]="getQualiteAirProgress() > 75 ? 'primary' : getQualiteAirProgress() > 50 ? 'accent' : 'warn'">
+                </mat-progress-bar>
+              </div>
+            } @else {
+              <div class="text-center text-gray-500">
+                <mat-icon class="text-4xl mb-2">cloud_off</mat-icon>
+                <div>Aucune donnée</div>
+              </div>
+            }
           </mat-card-content>
           <mat-card-actions>
             <button mat-button color="primary">Voir détails</button>
@@ -66,16 +129,42 @@
       <mat-grid-tile>
         <mat-card class="w-full h-full hover-azure">
           <mat-card-header>
-            <mat-icon mat-card-avatar class="bg-orange-500 text-white">thermostat</mat-icon>
+            <mat-icon
+              mat-card-avatar
+              [style.background-color]="getTemperatureColor()"
+              class="text-white">
+              thermostat
+            </mat-icon>
             <mat-card-title>Température</mat-card-title>
             <mat-card-subtitle>Conditions actuelles</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content class="flex-1 flex flex-col justify-center">
-            <div class="text-center">
-              <div class="text-4xl font-bold text-orange-600 mb-2">22°C</div>
-              <div class="text-sm text-gray-600 mb-4">Ressentie: 24°C</div>
-              <mat-progress-bar mode="determinate" value="60" color="accent"></mat-progress-bar>
-            </div>
+            @if (isLoading) {
+              <div class="text-center">
+                <mat-icon class="animate-spin text-4xl text-blue-500 mb-4">refresh</mat-icon>
+                <div class="text-gray-600">Chargement...</div>
+              </div>
+            } @else if (donneeEnTempsReel) {
+              <div class="text-center">
+                <div class="text-4xl font-bold mb-2" [style.color]="getTemperatureColor()">
+                  {{ donneeEnTempsReel.temperatureCelsius | number:'1.1-1' }}°C
+                </div>
+                <div class="text-sm text-gray-600 mb-4">
+                  Ressentie: {{ donneeEnTempsReel.temperatureFahrenheit | number:'1.0-0' }}°F<br>
+                  Humidité: {{ donneeEnTempsReel.humidite | number:'1.0-0' }}%
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getTemperatureProgress()"
+                  color="accent">
+                </mat-progress-bar>
+              </div>
+            } @else {
+              <div class="text-center text-gray-500">
+                <mat-icon class="text-4xl mb-2">thermostat_off</mat-icon>
+                <div>Aucune donnée</div>
+              </div>
+            }
           </mat-card-content>
           <mat-card-actions>
             <button mat-button color="primary">Historique</button>
@@ -83,72 +172,224 @@
         </mat-card>
       </mat-grid-tile>
 
-      <!-- Carte Trafic -->
+      <!-- Carte Humidité -->
       <mat-grid-tile>
         <mat-card class="w-full h-full hover-azure">
           <mat-card-header>
-            <mat-icon mat-card-avatar class="bg-red-500 text-white">traffic</mat-icon>
-            <mat-card-title>Trafic</mat-card-title>
-            <mat-card-subtitle>État des routes</mat-card-subtitle>
+            <mat-icon mat-card-avatar class="bg-blue-500 text-white">water_drop</mat-icon>
+            <mat-card-title>Humidité</mat-card-title>
+            <mat-card-subtitle>Taux d'humidité</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content class="flex-1 flex flex-col justify-center">
-            <div class="text-center">
-              <div class="text-4xl font-bold text-red-600 mb-2">Dense</div>
-              <div class="text-sm text-gray-600 mb-4">Délai: +15 min</div>
-              <mat-progress-bar mode="determinate" value="85" color="warn"></mat-progress-bar>
-            </div>
+            @if (isLoading) {
+              <div class="text-center">
+                <mat-icon class="animate-spin text-4xl text-blue-500 mb-4">refresh</mat-icon>
+                <div class="text-gray-600">Chargement...</div>
+              </div>
+            } @else if (donneeEnTempsReel) {
+              <div class="text-center">
+                <div class="text-4xl font-bold text-blue-600 mb-2">
+                  {{ donneeEnTempsReel.humidite | number:'1.0-0' }}%
+                </div>
+                <div class="text-sm text-gray-600 mb-4">
+                  Conditions: {{ donneeEnTempsReel.conditionsMeteo }}<br>
+                  Nuages: {{ donneeEnTempsReel.nuageux | number:'1.0-0' }}%
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getHumiditeProgress()"
+                  color="primary">
+                </mat-progress-bar>
+              </div>
+            } @else {
+              <div class="text-center text-gray-500">
+                <mat-icon class="text-4xl mb-2">water_drop_off</mat-icon>
+                <div>Aucune donnée</div>
+              </div>
+            }
           </mat-card-content>
           <mat-card-actions>
-            <button mat-button color="primary">Itinéraires</button>
+            <button mat-button color="primary">Tendances</button>
           </mat-card-actions>
         </mat-card>
       </mat-grid-tile>
 
-      <!-- Carte Mes Commentaires -->
+      <!-- Carte Indice UV -->
       <mat-grid-tile>
         <mat-card class="w-full h-full hover-azure">
           <mat-card-header>
-            <mat-icon mat-card-avatar class="bg-purple-500 text-white">comment</mat-icon>
-            <mat-card-title>Mes Commentaires</mat-card-title>
-            <mat-card-subtitle>Participation citoyenne</mat-card-subtitle>
+            <mat-icon
+              mat-card-avatar
+              [style.background-color]="getUVColor()"
+              class="text-white">
+              wb_sunny
+            </mat-icon>
+            <mat-card-title>Indice UV</mat-card-title>
+            <mat-card-subtitle>Rayonnement solaire</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content class="flex-1 flex flex-col justify-center">
-            <div class="text-center">
-              <div class="text-4xl font-bold text-purple-600 mb-2">3</div>
-              <div class="text-sm text-gray-600 mb-4">Commentaires publiés</div>
-              <button mat-raised-button color="primary" class="w-full">
-                <mat-icon class="mr-2">add</mat-icon>
-                Nouveau commentaire
-              </button>
-            </div>
+            @if (isLoading) {
+              <div class="text-center">
+                <mat-icon class="animate-spin text-4xl text-blue-500 mb-4">refresh</mat-icon>
+                <div class="text-gray-600">Chargement...</div>
+              </div>
+            } @else if (donneeEnTempsReel) {
+              <div class="text-center">
+                <div class="text-4xl font-bold mb-2" [style.color]="getUVColor()">
+                  {{ donneeEnTempsReel.indiceUv | number:'1.0-0' }}
+                </div>
+                <div class="text-sm text-gray-600 mb-4">
+                  Niveau: {{ getUVLevel() }}<br>
+                  Vent: {{ donneeEnTempsReel.vitesseVentKph | number:'1.1-1' }} km/h
+                </div>
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="getUVProgress()"
+                  [color]="getUVProgress() < 50 ? 'primary' : 'warn'">
+                </mat-progress-bar>
+              </div>
+            } @else {
+              <div class="text-center text-gray-500">
+                <mat-icon class="text-4xl mb-2">wb_sunny_off</mat-icon>
+                <div>Aucune donnée</div>
+              </div>
+            }
           </mat-card-content>
           <mat-card-actions>
-            <button mat-button color="primary">Voir tous</button>
+            <button mat-button color="primary">Protection</button>
           </mat-card-actions>
         </mat-card>
       </mat-grid-tile>
 
     </mat-grid-list>
 
+    <!-- Section Données Détaillées -->
+    @if (donneeEnTempsReel && !isLoading) {
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+          <mat-icon class="mr-2 text-blue-500">analytics</mat-icon>
+          Données Détaillées du Capteur {{ donneeEnTempsReel.idCapteur }}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Localisation -->
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+              <mat-icon class="text-blue-600 mr-2">place</mat-icon>
+              <h3 class="font-semibold text-gray-800">Localisation</h3>
+            </div>
+            <p class="text-sm text-gray-600">{{ donneeEnTempsReel.localisation }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ donneeEnTempsReel.coordonnees }}</p>
+          </div>
+
+          <!-- Précipitations -->
+          <div class="bg-indigo-50 p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+              <mat-icon class="text-indigo-600 mr-2">water_drop</mat-icon>
+              <h3 class="font-semibold text-gray-800">Précipitations</h3>
+            </div>
+            <p class="text-lg font-bold text-indigo-600">
+              {{ donneeEnTempsReel.precipitationMm | number:'1.1-1' }} mm
+            </p>
+            <p class="text-xs text-gray-500">Dernières 24h</p>
+          </div>
+
+          <!-- Pollution NO2 -->
+          <div class="bg-orange-50 p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+              <mat-icon class="text-orange-600 mr-2">air</mat-icon>
+              <h3 class="font-semibold text-gray-800">NO2</h3>
+            </div>
+            <p class="text-lg font-bold text-orange-600">
+              {{ donneeEnTempsReel.no2 | number:'1.1-1' }} μg/m³
+            </p>
+            <p class="text-xs text-gray-500">Dioxyde d'azote</p>
+          </div>
+
+          <!-- Ozone O3 -->
+          <div class="bg-green-50 p-4 rounded-lg">
+            <div class="flex items-center mb-2">
+              <mat-icon class="text-green-600 mr-2">eco</mat-icon>
+              <h3 class="font-semibold text-gray-800">O3</h3>
+            </div>
+            <p class="text-lg font-bold text-green-600">
+              {{ donneeEnTempsReel.o3 | number:'1.1-1' }} μg/m³
+            </p>
+            <p class="text-xs text-gray-500">Ozone</p>
+          </div>
+        </div>
+
+        <!-- Informations sur le capteur -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <div class="flex items-center justify-between text-sm text-gray-600">
+            <div class="flex items-center space-x-4">
+              <span>Capteur: {{ donneeEnTempsReel.nomCapteur }}</span>
+              <span>Type: {{ donneeEnTempsReel.typeCapteur }}</span>
+              <span>Source: {{ donneeEnTempsReel.sourceApi }}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <mat-icon class="text-green-500 text-sm">check_circle</mat-icon>
+              <span>{{ donneeEnTempsReel.statutDonnee }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Section Alertes Récentes -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
       <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
         <mat-icon class="mr-2 text-yellow-500">notifications</mat-icon>
-        Alertes Récentes
+        Alertes et Notifications
       </h2>
       <div class="space-y-3">
-        <div class="flex items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-          <mat-icon class="text-yellow-600 mr-3">warning</mat-icon>
-          <div class="flex-1">
-            <div class="font-medium text-gray-800">Pic de pollution détecté</div>
-            <div class="text-sm text-gray-600">Zone: Centre-ville • Il y a 2h</div>
-          </div>
-        </div>
+        <!-- Alerte basée sur les données réelles -->
+        @if (donneeEnTempsReel) {
+          @if (donneeEnTempsReel.indiceUv > 7) {
+            <div class="flex items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+              <mat-icon class="text-red-600 mr-3">warning</mat-icon>
+              <div class="flex-1">
+                <div class="font-medium text-gray-800">Indice UV élevé détecté</div>
+                <div class="text-sm text-gray-600">
+                  Niveau {{ getUVLevel() }} ({{ donneeEnTempsReel.indiceUv | number:'1.0-0' }}) - Protection recommandée
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (donneeEnTempsReel.pm10 > 50) {
+            <div class="flex items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+              <mat-icon class="text-yellow-600 mr-3">warning</mat-icon>
+              <div class="flex-1">
+                <div class="font-medium text-gray-800">Qualité de l'air dégradée</div>
+                <div class="text-sm text-gray-600">
+                  PM10: {{ donneeEnTempsReel.pm10 | number:'1.1-1' }} μg/m³ - Évitez les activités extérieures intenses
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (donneeEnTempsReel.temperatureCelsius > 30) {
+            <div class="flex items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+              <mat-icon class="text-orange-600 mr-3">thermostat</mat-icon>
+              <div class="flex-1">
+                <div class="font-medium text-gray-800">Température élevée</div>
+                <div class="text-sm text-gray-600">
+                  {{ donneeEnTempsReel.temperatureCelsius | number:'1.1-1' }}°C - Restez hydraté
+                </div>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Alerte système par défaut -->
         <div class="flex items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
           <mat-icon class="text-blue-600 mr-3">info</mat-icon>
           <div class="flex-1">
-            <div class="font-medium text-gray-800">Maintenance capteurs programmée</div>
-            <div class="text-sm text-gray-600">Secteur 3 • Demain 14h-16h</div>
+            <div class="font-medium text-gray-800">Système de surveillance actif</div>
+            <div class="text-sm text-gray-600">
+              Capteurs IoT en fonctionnement - Données mises à jour toutes les 30 secondes
+            </div>
           </div>
         </div>
       </div>
@@ -163,12 +404,12 @@
 
       <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
         <mat-icon class="text-2xl text-green-500">analytics</mat-icon>
-        <span>Statistiques mensuelles</span>
+        <span>Historique des données</span>
       </button>
 
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
-        <mat-icon class="text-2xl text-purple-500">help</mat-icon>
-        <span>Aide & Contact</span>
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="refreshData()">
+        <mat-icon class="text-2xl text-purple-500">refresh</mat-icon>
+        <span>Actualiser maintenant</span>
       </button>
     </div>
 
