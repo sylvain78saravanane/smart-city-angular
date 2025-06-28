@@ -10,6 +10,7 @@ import {PageConnexionAdmin} from './page-connexion-admin/page-connexion-admin';
 import {AdminDashboard} from './admin-dashboard/admin-dashboard';
 import {PageConnexionChercheur} from './page-connexion-chercheur/page-connexion-chercheur';
 import {ErrorPage} from './error-page/error-page';
+import {Capteur} from './capteur/capteur';
 
 export const routes: Routes = [
   {path:'login', component: PageConnexion},
@@ -22,4 +23,5 @@ export const routes: Routes = [
   {path: 'dashboard/administrateur', component: AdminDashboard},
   {path: 'login/chercheur', component : PageConnexionChercheur},
   {path: '**', component : ErrorPage},
+  {path: 'dashboard/administrateur/capteur', component: Capteur}
 ];

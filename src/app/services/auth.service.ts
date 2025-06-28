@@ -14,21 +14,24 @@ export interface AdminLoginRequest extends LoginRequest {
   code_admin: string;
 }
 
+// Interface correspondant à la réponse du back-end pour /login
+export interface LoginTokenResponse {
+  token: string;
+  type: string;
+  utilisateur: LoginResponse;
+  expiresIn: number;
+}
 
+// Interface pour les données utilisateur du back-end
 export interface DonneesSpecifiques {
-  // Pour les citoyens
   latitude?: number;
   longitude?: number;
-  // Pour les administrateurs
   codeAdmin?: string;
   salaire?: number;
-  // Pour les gestionnaires
   codeGV?: string;
   nomDepartement?: string;
-  // Pour les chercheurs
   institut?: string;
   domaineRecherche?: string;
-  // Type général
   type: string;
 }
 
@@ -38,17 +41,17 @@ export interface LoginResponse {
   prenom: string;
   nomComplet: string;
   email: string;
-  dateNaissance: string;
-  telephone: string;
-  numeroRue: string;
-  adresse: string;
-  codePostal: string;
+  dateNaissance?: string;
+  telephone?: string;
+  numeroRue?: string;
+  adresse?: string;
+  codePostal?: string;
   actif: boolean;
-  notificationActive: boolean;
+  notificationActive?: boolean;
   role: string;
   typeUtilisateur: string;
   donneesSpecifiques: DonneesSpecifiques;
-  nombrePermissions: number;
+  nombrePermissions?: number;
 }
 
 export interface AdminLoginResponse extends LoginResponse {
@@ -102,8 +105,15 @@ export class AuthService {
    * Connexion utilisateur normale
    */
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials)
+    return this.http.post<LoginTokenResponse>(`${this.API_URL}/login`, credentials)
       .pipe(
+        map(response => {
+          // Stocker le token
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+          }
+          return response.utilisateur;
+        }),
         tap(user => {
           this.setCurrentUser(user);
         }),
@@ -115,41 +125,25 @@ export class AuthService {
    * Connexion administrateur avec code admin
    */
   loginAdmin(credentials: AdminLoginRequest): Observable<AdminLoginResponse> {
-    // Utilisation de l'endpoint normal puis vérification côté client
-    const loginData = {
-      email: credentials.email,
-      mot_de_passe: credentials.mot_de_passe
-    };
-
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, loginData)
+    return this.http.post<ResponseUtilisateurDTO>(`${this.API_URL}/admin/login`, credentials)
       .pipe(
         map(user => {
-          // Vérification que c'est bien un admin
-          if (user.role !== 'ADMINISTRATEUR') {
-            throw new Error('Accès refusé - Droits administrateur requis');
-          }
-
-          // Vérification du code admin
-          // IMPORTANT: Dans un vrai projet, cette vérification doit se faire côté serveur
-          // Ici on simule en comparant avec le codeAdmin retourné par le serveur
-          const adminUser = user as AdminLoginResponse;
-
-          // Si le serveur ne retourne pas le code admin, on peut le simuler
-          // (à remplacer par la vraie logique de votre backend)
-          if (!adminUser.donneesSpecifiques?.codeAdmin) {
-            // Simulation pour les tests - À SUPPRIMER en production
-            adminUser.donneesSpecifiques = {
-              ...adminUser.donneesSpecifiques,
-              codeAdmin: '1234', // Code par défaut pour les tests
-              salaire: adminUser.donneesSpecifiques?.salaire || 0,
+          // Adapter la réponse du back-end au format attendu
+          const adminUser: AdminLoginResponse = {
+            idUtilisateur: user.idUtilisateur,
+            nom: user.nom,
+            prenom: user.prenom,
+            nomComplet: user.nomComplet || `${user.prenom} ${user.nom}`,
+            email: user.email,
+            actif: user.actif,
+            role: 'ADMINISTRATEUR',
+            typeUtilisateur: user.typeUtilisateur,
+            donneesSpecifiques: {
+              codeAdmin: credentials.code_admin, // On utilise le code envoyé
+              salaire: 0, // À adapter selon votre back-end
               type: 'ADMINISTRATEUR'
-            };
-          }
-
-          if (adminUser.donneesSpecifiques.codeAdmin !== credentials.code_admin) {
-            throw new Error('Code administrateur incorrect');
-          }
-
+            }
+          };
           return adminUser;
         }),
         tap(user => {
@@ -166,10 +160,7 @@ export class AuthService {
   register(userData: CreateUtilisateurDTO): Observable<ResponseUtilisateurDTO> {
     return this.http.post<ResponseUtilisateurDTO>(`${this.API_URL}/utilisateurs`, userData)
       .pipe(
-        catchError(error => {
-          console.error('Erreur d\'inscription :', error);
-          throw error;
-        })
+        catchError(this.handleError)
       );
   }
 
@@ -230,24 +221,20 @@ export class AuthService {
   }
 
   /**
-   * Vérifier le code administrateur
-   */
-  verifyAdminCode(codeAdmin: string): boolean {
-    const user = this.getCurrentUser();
-    if (!user || user.role !== 'ADMINISTRATEUR') {
-      return false;
-    }
-    return user.donneesSpecifiques?.codeAdmin === codeAdmin;
-  }
-
-  /**
    * Obtenir les informations d'un utilisateur par ID
    */
   getUserById(id: number): Observable<LoginResponse> {
-    return this.http.get<LoginResponse>(`${this.API_URL}/utilisateurs/${id}`)
-      .pipe(
-        catchError(this.handleError)
-      );
+    return this.http.get<LoginResponse>(`${this.API_URL}/utilisateurs/${id}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtenir les headers d'authentification
+   */
+  private getAuthHeaders(): { [key: string]: string } {
+    const token = localStorage.getItem('authToken');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
   }
 
   /**
@@ -319,25 +306,19 @@ export class AuthService {
 
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Erreur: ${error.error.message}`;
-    } else if (error instanceof Error) {
-      // Erreur custom (ex: code admin incorrect)
-      errorMessage = error.message;
     } else {
       switch (error.status) {
         case 400:
-          errorMessage = 'Données invalides - Vérifiez vos identifiants';
+          errorMessage = 'Email, mot de passe et code administrateur requis';
           break;
         case 401:
-          errorMessage = 'Accès refusé - Email, mot de passe ou code administrateur incorrect';
+          errorMessage = 'Identifiants administrateur invalides';
           break;
         case 403:
           errorMessage = 'Accès refusé - Droits administrateur insuffisants';
           break;
-        case 404:
-          errorMessage = 'Compte administrateur non trouvé';
-          break;
         case 422:
-          errorMessage = 'Code administrateur invalide - 4 chiffres requis';
+          errorMessage = 'Le code administrateur doit contenir exactement 4 chiffres';
           break;
         case 500:
           errorMessage = 'Erreur serveur - Contactez le support technique';
@@ -353,26 +334,4 @@ export class AuthService {
     console.error('Erreur AuthService Admin:', error);
     return throwError(() => new Error(errorMessage));
   };
-
-  /**
-   * Fonction utilitaire pour formater les données d'inscription
-   */
-  static formatRegisterData(formData: any): CreateUtilisateurDTO {
-    return {
-      nom: formData.nom,
-      prenom: formData.prenom,
-      email: formData.email,
-      motDePasse: formData.motDePasse,
-      dateNaissance: formData.dateNaissance,
-      telephone: formData.telephone,
-      numeroRue: formData.numeroRue,
-      adresse: formData.adresse,
-      codePostal: formData.codePostal,
-      typeUtilisateur: 'CITOYEN',
-      donneesSpecifiques: {
-        latitude: formData.latitude,
-        longitude: formData.longitude
-      }
-    };
-  }
 }
