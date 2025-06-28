@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import {PageConnexion} from './page-connexion/page-connexion';
 import {PageAccueil} from './page-accueil/page-accueil';
 import {CitoyenDashboard} from './citoyen-dashboard/citoyen-dashboard';
-import {CitoyenGuard} from '../auth.guard';
+import {AdminGuard, CitoyenGuard} from '../auth.guard';
 import {PageInscriptionCitoyen} from './page-inscription-citoyen/page-inscription-citoyen';
 import {PagePlan} from './page-plan/page-plan';
 import {MentionsLegales} from './mentions-legales/mentions-legales';
@@ -22,6 +22,6 @@ export const routes: Routes = [
   {path: 'login/administrateur', component: PageConnexionAdmin},
   {path: 'dashboard/administrateur', component: AdminDashboard},
   {path: 'login/chercheur', component : PageConnexionChercheur},
-  {path: '**', component : ErrorPage},
-  {path: 'dashboard/administrateur/capteur', component: Capteur}
+  {path: 'dashboard/administrateur/capteur',component: Capteur},
+  {path: '**', component : ErrorPage}, // à mettre toujours à la fin
 ];

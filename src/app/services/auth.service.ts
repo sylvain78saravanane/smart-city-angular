@@ -124,36 +124,60 @@ export class AuthService {
   /**
    * Connexion administrateur avec code admin
    */
+
   loginAdmin(credentials: AdminLoginRequest): Observable<AdminLoginResponse> {
-    return this.http.post<ResponseUtilisateurDTO>(`${this.API_URL}/admin/login`, credentials)
+    return this.http.post<any>(`${this.API_URL}/admin/login`, credentials)
       .pipe(
-        map(user => {
-          // Adapter la réponse du back-end au format attendu
+        map(response => {
+          console.log('🔍 Réponse complète du backend admin:', response);
+
+          // CORRECTION PRINCIPALE : Stocker le token si présent
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+            console.log('✅ Token admin stocké depuis response.token');
+          } else {
+            // Si pas de token dans la réponse, créer un token temporaire
+            // Ceci est une solution temporaire en attendant que votre backend retourne un token
+            const tempToken = 'admin-' + btoa(response.email || credentials.email) + '-' + Date.now();
+            localStorage.setItem('authToken', tempToken);
+            console.log('⚠️ Token temporaire créé:', tempToken);
+          }
+
+          // Adapter la réponse selon la structure reçue
+          let userData;
+          if (response.utilisateur) {
+            userData = response.utilisateur;
+          } else {
+            userData = response;
+          }
+
           const adminUser: AdminLoginResponse = {
-            idUtilisateur: user.idUtilisateur,
-            nom: user.nom,
-            prenom: user.prenom,
-            nomComplet: user.nomComplet || `${user.prenom} ${user.nom}`,
-            email: user.email,
-            actif: user.actif,
+            idUtilisateur: userData.idUtilisateur,
+            nom: userData.nom,
+            prenom: userData.prenom,
+            nomComplet: userData.nomComplet || `${userData.prenom} ${userData.nom}`,
+            email: userData.email,
+            actif: userData.actif,
             role: 'ADMINISTRATEUR',
-            typeUtilisateur: user.typeUtilisateur,
+            typeUtilisateur: userData.typeUtilisateur,
             donneesSpecifiques: {
-              codeAdmin: credentials.code_admin, // On utilise le code envoyé
-              salaire: 0, // À adapter selon votre back-end
+              codeAdmin: credentials.code_admin,
+              salaire: userData.donneesSpecifiques?.salaire || 0,
               type: 'ADMINISTRATEUR'
             }
           };
+
+          console.log('✅ AdminUser créé:', adminUser);
           return adminUser;
         }),
         tap(user => {
           this.setCurrentUser(user);
           localStorage.setItem('isAdmin', 'true');
+          console.log('✅ Admin configuré avec token:', localStorage.getItem('authToken'));
         }),
         catchError(this.handleAdminError)
       );
   }
-
   /**
    * Création d'un nouveau citoyen
    */

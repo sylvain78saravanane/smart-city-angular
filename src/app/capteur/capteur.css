@@ -1,0 +1,387 @@
+/* src/app/capteur/capteur.css */
+
+/* ===================================================================
+   STYLES GESTION CAPTEURS
+   =================================================================== */
+
+/* Container principal */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Cartes avec effet hover */
+.hover-azure {
+  transition: all 0.3s ease-in-out;
+  border-radius: 12px !important;
+}
+
+.hover-azure:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15);
+  border-left: 4px solid #ef4444;
+}
+
+/* Styles pour les formulaires */
+mat-form-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.mat-mdc-form-field {
+  margin-bottom: 0.5rem;
+}
+
+/* Styles pour les champs avec préfixe d'icône */
+mat-icon[matPrefix] {
+  margin-right: 0.5rem;
+  color: #6b7280;
+}
+
+/* Grille responsive pour les formulaires */
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lg\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
+  .lg\:col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+}
+
+/* Espacement */
+.gap-4 {
+  gap: 1rem;
+}
+
+.space-x-1 > * + * {
+  margin-left: 0.25rem;
+}
+
+.space-x-2 > * + * {
+  margin-left: 0.5rem;
+}
+
+.space-x-3 > * + * {
+  margin-left: 0.75rem;
+}
+
+.space-x-4 > * + * {
+  margin-left: 1rem;
+}
+
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+/* Styles pour les cartes Material */
+mat-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+mat-card-header {
+  padding-bottom: 8px !important;
+}
+
+mat-card-content {
+  padding-top: 8px !important;
+}
+
+/* Styles pour les en-têtes de sections */
+h3 {
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Styles pour la table */
+table {
+  width: 100%;
+}
+
+.mat-mdc-table {
+  background: white;
+}
+
+.mat-mdc-header-row {
+  background-color: #f8fafc;
+  font-weight: 600;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f8fafc;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Styles pour les chips de statut */
+.mat-mdc-chip {
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  min-height: 24px !important;
+}
+
+.mat-mdc-chip.text-xs {
+  font-size: 0.75rem !important;
+  padding: 2px 8px !important;
+}
+
+/* Couleurs pour les statuts */
+.bg-green-400 { background-color: #4ade80; }
+.bg-gray-400 { background-color: #9ca3af; }
+.bg-orange-400 { background-color: #fb923c; }
+.bg-red-400 { background-color: #f87171; }
+
+.text-green-500 { color: #10b981; }
+.text-gray-500 { color: #6b7280; }
+.text-orange-500 { color: #f97316; }
+.text-red-500 { color: #ef4444; }
+.text-blue-500 { color: #3b82f6; }
+.text-purple-500 { color: #8b5cf6; }
+.text-indigo-500 { color: #6366f1; }
+
+/* Couleurs de fond pour les en-têtes de formulaire */
+.bg-green-50 { background-color: #f0fdf4; }
+.bg-blue-50 { background-color: #eff6ff; }
+
+/* Bordures colorées */
+.border-green-200 { border-color: #bbf7d0; }
+.border-blue-200 { border-color: #dbeafe; }
+
+/* Styles pour les boutons d'action */
+button.mat-mdc-icon-button {
+  transition: all 0.2s ease-in-out;
+}
+
+button.mat-mdc-icon-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour les menus */
+.mat-mdc-menu-panel {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Styles pour les tooltips */
+.mat-mdc-tooltip {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  font-size: 0.75rem !important;
+}
+
+/* Animation d'entrée */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+
+  /* Table responsive */
+  .mat-mdc-table {
+    font-size: 0.875rem;
+  }
+
+  .mat-mdc-header-cell,
+  .mat-mdc-cell {
+    padding: 8px 4px;
+  }
+
+  /* Masquer certaines colonnes sur mobile */
+  .mat-column-gestionnaire,
+  .mat-column-dateInstallation {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* En-tête responsive */
+  .flex.items-center.justify-between {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .flex.flex-col.space-y-2 {
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  /* Boutons responsive */
+  button {
+    width: 100%;
+    justify-content: center;
+  }
+
+
+  /* Masquer colonnes supplémentaires sur très petit écran */
+  .mat-column-typeCapteur,
+  .mat-column-adresse {
+    display: none;
+  }
+}
+
+/* Styles pour les messages d'erreur */
+mat-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* Styles pour les spinners */
+mat-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+/* Amélioration de l'accessibilité */
+button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Styles pour les états de chargement */
+.loading-shimmer {
+  background: linear-gradient(90deg, #fee2e2 25%, #fef2f2 50%, #fee2e2 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Styles spéciaux pour les cartes de statistiques */
+.text-center mat-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+/* Styles pour les badges administrateur */
+.bg-red-500 {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Transition fluide pour tous les éléments interactifs */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Styles pour les coordonnées GPS */
+.text-xs.text-gray-500 {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+}
+
+/* Animation hover pour les lignes de table */
+.mat-mdc-row {
+  transition: all 0.2s ease-in-out;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f8fafc !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Styles pour les icônes de type de capteur */
+mat-icon.mr-2.text-gray-600 {
+  color: #4b5563 !important;
+  font-size: 1.25rem;
+}
+
+/* Styles pour les menus contextuels */
+.mat-mdc-menu-item {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.mat-mdc-menu-item:hover {
+  background-color: #f3f4f6;
+}
+
+/* Classes utilitaires */
+.w-2 { width: 0.5rem; }
+.h-2 { height: 0.5rem; }
+.w-3 { width: 0.75rem; }
+.h-3 { height: 0.75rem; }
+.rounded-full { border-radius: 9999px; }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.max-w-xs { max-width: 20rem; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+/* Styles pour les formulaires de validation */
+.ng-invalid.ng-touched {
+  border-color: #ef4444;
+}
+
+.ng-valid.ng-touched {
+  border-color: #10b981;
+}
+
+/* Animation pour les nouveaux éléments */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}

@@ -45,10 +45,10 @@ export class AuthGuard implements CanActivate {
   private redirectBasedOnRole(role: string): void {
     switch (role) {
       case 'CITOYEN':
-        this.router.navigate(['/dashboard/citoyen']);
+        this.router.navigate(['/dashboard']);
         break;
       case 'ADMINISTRATEUR':
-        this.router.navigate(['/dashboard/admin']);
+        this.router.navigate(['/dashboard/administrateur']);
         break;
       case 'GESTIONNAIRE_VILLE':
         this.router.navigate(['/dashboard/gestionnaire']);
@@ -88,7 +88,7 @@ export class AdminGuard implements CanActivate {
           this.redirectBasedOnRole(user.role);
         } else {
           // Pas connecté, rediriger vers la page de connexion admin
-          this.router.navigate(['/admin/login'], {
+          this.router.navigate(['/login/administrateur'], {
             queryParams: { returnUrl: state.url, message: 'Accès administrateur requis' }
           });
         }
@@ -102,7 +102,7 @@ export class AdminGuard implements CanActivate {
     this.router.navigate(['/login'], {
       queryParams: {
         error: 'Accès refusé - Droits administrateur requis',
-        returnUrl: '/admin/login'
+        returnUrl: '/login/administrateur'
       }
     });
   }
@@ -165,7 +165,7 @@ export class CitoyenGuard implements CanActivate {
   private redirectBasedOnRole(role: string): void {
     switch (role) {
       case 'ADMINISTRATEUR':
-        this.router.navigate(['/dashboard/admin']);
+        this.router.navigate(['/dashboard/administrateur']);
         break;
       case 'GESTIONNAIRE_VILLE':
         this.router.navigate(['/dashboard/gestionnaire']);
