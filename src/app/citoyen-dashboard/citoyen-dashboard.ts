@@ -263,4 +263,8 @@ export class CitoyenDashboard implements OnInit, OnDestroy {
     if (pm10 <= 50) return 50;
     return 25;
   }
+
+  goToCommentaires() {
+    this.router.navigate(['/dashboard/commentaires']);
+  }
 }

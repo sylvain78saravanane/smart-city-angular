@@ -1,0 +1,358 @@
+<app-header></app-header>
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
+  <div class="container mx-auto max-w-6xl">
+
+    <!-- En-tête avec navigation -->
+    <div class="mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+              💬 Espace Commentaires
+            </h1>
+            <p class="text-gray-600">
+              Partagez vos suggestions et observations sur les données IoT de la ville
+            </p>
+          </div>
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="goBack()"
+            class="flex items-center space-x-2">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Retour au Dashboard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglets -->
+    <mat-tab-group class="mb-8" mat-stretch-tabs>
+
+      <!-- Onglet: Nouveau commentaire -->
+      <mat-tab label="✍️ Nouveau commentaire">
+        <div class="p-6">
+          <mat-card class="max-w-4xl mx-auto">
+            <mat-card-header>
+              <mat-card-title class="flex items-center">
+                <mat-icon class="mr-2 text-blue-500">add_comment</mat-icon>
+                Publier un nouveau commentaire
+              </mat-card-title>
+              <mat-card-subtitle>
+                Exprimez vos suggestions concernant les capteurs IoT, la qualité des données ou les améliorations souhaitées
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form [formGroup]="commentaireForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+                <!-- Titre (optionnel) -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Titre (optionnel)</mat-label>
+                  <input
+                    matInput
+                    formControlName="titre"
+                    placeholder="Un titre accrocheur pour votre commentaire...">
+                  <mat-icon matPrefix class="mr-2 text-gray-400">title</mat-icon>
+                </mat-form-field>
+
+                <!-- Sujet -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Catégorie</mat-label>
+                  <mat-select formControlName="sujet">
+                    @for (sujet of sujets; track sujet.value) {
+                      <mat-option [value]="sujet.value">{{ sujet.label }}</mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix class="mr-2 text-gray-400">category</mat-icon>
+                </mat-form-field>
+
+                <!-- Contenu -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Votre commentaire *</mat-label>
+                  <textarea
+                    matInput
+                    formControlName="contenu"
+                    rows="6"
+                    placeholder="Décrivez votre suggestion, observation ou demande d'amélioration concernant les capteurs IoT...">
+                  </textarea>
+                  <mat-icon matPrefix class="mr-2 text-gray-400">comment</mat-icon>
+                  @if (commentaireForm.get('contenu')?.invalid && commentaireForm.get('contenu')?.touched) {
+                    <mat-error>{{ getContenuErrorMessage() }}</mat-error>
+                  }
+                </mat-form-field>
+
+                <!-- Localisation (optionnelle) -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Localisation (optionnelle)</mat-label>
+                  <input
+                    matInput
+                    formControlName="localisation"
+                    placeholder="Ex: Place de la République, Quartier des Halles...">
+                  <mat-icon matPrefix class="mr-2 text-gray-400">place</mat-icon>
+                </mat-form-field>
+
+                <!-- Note d'évaluation (optionnelle) -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Note d'évaluation (1-5)</mat-label>
+                  <mat-select formControlName="noteEvaluation">
+                    <mat-option [value]="null">Aucune note</mat-option>
+                    <mat-option [value]="1">⭐ (1) - Très insatisfait</mat-option>
+                    <mat-option [value]="2">⭐⭐ (2) - Insatisfait</mat-option>
+                    <mat-option [value]="3">⭐⭐⭐ (3) - Neutre</mat-option>
+                    <mat-option [value]="4">⭐⭐⭐⭐ (4) - Satisfait</mat-option>
+                    <mat-option [value]="5">⭐⭐⭐⭐⭐ (5) - Très satisfait</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix class="mr-2 text-gray-400">star</mat-icon>
+                </mat-form-field>
+
+                <!-- Bouton de soumission -->
+                <div class="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    mat-button
+                    (click)="commentaireForm.reset(); commentaireForm.patchValue({ sujet: 'GENERAL' })">
+                    Réinitialiser
+                  </button>
+
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    type="submit"
+                    [disabled]="isSubmitting() || commentaireForm.invalid"
+                    class="min-w-32">
+                    @if (isSubmitting()) {
+                      <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+                      <span>Publication...</span>
+                    } @else {
+                      <mat-icon class="mr-2">send</mat-icon>
+                      <span>Publier</span>
+                    }
+                  </button>
+                </div>
+
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Onglet: Commentaires récents -->
+      <mat-tab label="🕒 Commentaires récents">
+        <div class="p-6">
+          @if (isLoading()) {
+            <div class="text-center py-8">
+              <mat-spinner class="mx-auto mb-4"></mat-spinner>
+              <p class="text-gray-600">Chargement des commentaires...</p>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @if (commentaires().length === 0) {
+                <mat-card class="text-center py-8">
+                  <mat-icon class="text-6xl text-gray-400 mb-4">comment</mat-icon>
+                  <h3 class="text-xl font-medium text-gray-600 mb-2">Aucun commentaire récent</h3>
+                  <p class="text-gray-500">Soyez le premier à partager vos suggestions !</p>
+                </mat-card>
+              } @else {
+                @for (commentaire of commentaires(); track commentaire.idCommentaire) {
+                  <mat-card class="hover-azure">
+                    <mat-card-header>
+                      <div class="flex items-center space-x-2">
+                        <span class="text-2xl">{{ getSujetIcon(commentaire.sujet || 'GENERAL') }}</span>
+                        <div>
+                          <mat-card-title class="text-lg">
+                            {{ commentaire.titre || 'Sans titre' }}
+                          </mat-card-title>
+                          <mat-card-subtitle class="flex items-center space-x-4">
+                            <span>Par {{ commentaire.nomCompletCitoyen }}</span>
+                            <span>•</span>
+                            <span>{{ formatDate(commentaire.dateCreation) }}</span>
+                            @if (commentaire.sujet) {
+                              <span>•</span>
+                              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                {{ getSujetLabel(commentaire.sujet) }}
+                              </span>
+                            }
+                          </mat-card-subtitle>
+                        </div>
+                      </div>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <p class="text-gray-700 mb-4">{{ commentaire.contenu }}</p>
+
+                      @if (commentaire.localisation) {
+                        <div class="flex items-center text-sm text-gray-600 mb-2">
+                          <mat-icon class="text-sm mr-1">place</mat-icon>
+                          <span>{{ commentaire.localisation }}</span>
+                        </div>
+                      }
+
+                      @if (commentaire.noteEvaluation) {
+                        <div class="flex items-center text-sm text-gray-600">
+                          <mat-icon class="text-sm mr-1">star</mat-icon>
+                          <span>Note: {{ commentaire.noteEvaluation }}/5</span>
+                        </div>
+                      }
+                    </mat-card-content>
+
+                    <mat-card-actions class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4">
+                        <button
+                          mat-button
+                          (click)="toggleLike(commentaire)"
+                          class="flex items-center space-x-1">
+                          <mat-icon>thumb_up</mat-icon>
+                          <span>{{ commentaire.nombreLikes }}</span>
+                        </button>
+
+                        <button
+                          mat-button
+                          (click)="toggleDislike(commentaire)"
+                          class="flex items-center space-x-1">
+                          <mat-icon>thumb_down</mat-icon>
+                          <span>{{ commentaire.nombreDislikes }}</span>
+                        </button>
+
+                        <span class="text-sm text-gray-500">
+                          {{ commentaire.totalInteractions }} interaction(s)
+                        </span>
+                      </div>
+
+                      <span class="text-xs text-gray-400">
+                        Il y a {{ commentaire.joursDepuisCreation }} jour(s)
+                      </span>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Onglet: Commentaires populaires -->
+      <mat-tab label="🔥 Populaires">
+        <div class="p-6">
+          @if (isLoading()) {
+            <div class="text-center py-8">
+              <mat-spinner class="mx-auto mb-4"></mat-spinner>
+              <p class="text-gray-600">Chargement des commentaires populaires...</p>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @if (commentairesPopulaires().length === 0) {
+                <mat-card class="text-center py-8">
+                  <mat-icon class="text-6xl text-gray-400 mb-4">trending_up</mat-icon>
+                  <h3 class="text-xl font-medium text-gray-600 mb-2">Aucun commentaire populaire</h3>
+                  <p class="text-gray-500">Les commentaires avec le plus d'interactions apparaîtront ici.</p>
+                </mat-card>
+              } @else {
+                @for (commentaire of commentairesPopulaires(); track commentaire.idCommentaire; let i = $index) {
+                  <mat-card class="hover-azure relative">
+                    <!-- Badge de popularité -->
+                    <div class="absolute top-4 right-4 bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                      {{ i + 1 }}
+                    </div>
+
+                    <mat-card-header>
+                      <div class="flex items-center space-x-2">
+                        <span class="text-2xl">{{ getSujetIcon(commentaire.sujet || 'GENERAL') }}</span>
+                        <div>
+                          <mat-card-title class="text-lg">
+                            {{ commentaire.titre || 'Sans titre' }}
+                          </mat-card-title>
+                          <mat-card-subtitle class="flex items-center space-x-4">
+                            <span>Par {{ commentaire.nomCompletCitoyen }}</span>
+                            <span>•</span>
+                            <span>{{ formatDate(commentaire.dateCreation) }}</span>
+                            @if (commentaire.sujet) {
+                              <span>•</span>
+                              <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
+                                {{ getSujetLabel(commentaire.sujet) }}
+                              </span>
+                            }
+                          </mat-card-subtitle>
+                        </div>
+                      </div>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <p class="text-gray-700 mb-4">{{ commentaire.resume }}</p>
+
+                      @if (commentaire.localisation) {
+                        <div class="flex items-center text-sm text-gray-600 mb-2">
+                          <mat-icon class="text-sm mr-1">place</mat-icon>
+                          <span>{{ commentaire.localisation }}</span>
+                        </div>
+                      }
+
+                      @if (commentaire.noteEvaluation) {
+                        <div class="flex items-center text-sm text-gray-600">
+                          <mat-icon class="text-sm mr-1">star</mat-icon>
+                          <span>Note: {{ commentaire.noteEvaluation }}/5</span>
+                        </div>
+                      }
+                    </mat-card-content>
+
+                    <mat-card-actions class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4">
+                        <button
+                          mat-button
+                          (click)="toggleLike(commentaire)"
+                          class="flex items-center space-x-1 text-green-600">
+                          <mat-icon>thumb_up</mat-icon>
+                          <span>{{ commentaire.nombreLikes }}</span>
+                        </button>
+
+                        <button
+                          mat-button
+                          (click)="toggleDislike(commentaire)"
+                          class="flex items-center space-x-1 text-red-600">
+                          <mat-icon>thumb_down</mat-icon>
+                          <span>{{ commentaire.nombreDislikes }}</span>
+                        </button>
+
+                        <span class="text-sm text-orange-600 font-medium">
+                          🔥 {{ commentaire.totalInteractions }} interaction(s)
+                        </span>
+                      </div>
+
+                      <span class="text-xs text-gray-400">
+                        Il y a {{ commentaire.joursDepuisCreation }} jour(s)
+                      </span>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+
+    <!-- Section d'aide -->
+    <mat-card class="bg-blue-50 border-l-4 border-blue-500">
+      <mat-card-content>
+        <div class="flex items-start space-x-4">
+          <mat-icon class="text-blue-500 text-3xl mt-1">info</mat-icon>
+          <div>
+            <h3 class="font-bold text-gray-800 mb-2">💡 Comment bien utiliser l'espace commentaires ?</h3>
+            <ul class="text-gray-700 space-y-1 list-disc list-inside">
+              <li><strong>Suggestions de capteurs :</strong> Proposez de nouveaux emplacements ou types de capteurs</li>
+              <li><strong>Amélioration des données :</strong> Signalez des problèmes ou suggestions sur la qualité des mesures</li>
+              <li><strong>Nouveaux paramètres :</strong> Demandez l'ajout de nouvelles métriques (bruit, luminosité, etc.)</li>
+              <li><strong>Problèmes locaux :</strong> Rapportez des observations spécifiques à votre quartier</li>
+              <li><strong>Soyez constructif :</strong> Vos commentaires aident à améliorer le système IoT de la ville</li>
+            </ul>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
+
+<app-footer></app-footer>
