@@ -89,6 +89,19 @@ export interface CreateUtilisateurDTO {
   };
 }
 
+export interface GestionnaireLoginRequest extends LoginRequest {
+  code_gv: string;
+}
+
+export interface GestionnaireLoginResponse extends LoginResponse {
+  donneesSpecifiques: DonneesSpecifiques & {
+    codeGV: string;
+    nomDepartement: string;
+    salaire: number;
+    type: 'GESTIONNAIRE_VILLE';
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -229,13 +242,6 @@ export class AuthService {
   }
 
   /**
-   * Vérifier si l'utilisateur est un citoyen
-   */
-  isCitoyen(): boolean {
-    return this.hasRole('CITOYEN');
-  }
-
-  /**
    * Vérifier si l'utilisateur est un administrateur
    */
   isAdmin(): boolean {
@@ -283,6 +289,80 @@ export class AuthService {
         localStorage.removeItem('currentUser');
       }
     }
+  }
+
+  /**
+   * Connexion gestionnaire de ville avec code GV
+   */
+  loginGestionnaire(credentials: GestionnaireLoginRequest): Observable<GestionnaireLoginResponse> {
+    return this.http.post<any>(`${this.API_URL}/gestionnaire/login`, credentials)
+      .pipe(
+        map(response => {
+          console.log('🔍 Réponse complète du backend gestionnaire:', response);
+
+          // Stocker le token si présent
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+            console.log('✅ Token gestionnaire stocké depuis response.token');
+          } else {
+            // Token temporaire si pas de token dans la réponse
+            const tempToken = 'gestionnaire-' + btoa(response.email || credentials.email) + '-' + Date.now();
+            localStorage.setItem('authToken', tempToken);
+            console.log('⚠️ Token temporaire créé:', tempToken);
+          }
+
+          // Adapter la réponse selon la structure reçue
+          let userData;
+          if (response.utilisateur) {
+            userData = response.utilisateur;
+          } else {
+            userData = response;
+          }
+
+          const gestionnaireUser: GestionnaireLoginResponse = {
+            idUtilisateur: userData.idUtilisateur,
+            nom: userData.nom,
+            prenom: userData.prenom,
+            nomComplet: userData.nomComplet || `${userData.prenom} ${userData.nom}`,
+            email: userData.email,
+            actif: userData.actif,
+            role: 'GESTIONNAIRE_VILLE',
+            typeUtilisateur: userData.typeUtilisateur,
+            donneesSpecifiques: {
+              codeGV: credentials.code_gv,
+              nomDepartement: userData.donneesSpecifiques?.nomDepartement || '',
+              salaire: userData.donneesSpecifiques?.salaire || 0,
+              type: 'GESTIONNAIRE_VILLE'
+            }
+          };
+
+          console.log('✅ GestionnaireUser créé:', gestionnaireUser);
+          return gestionnaireUser;
+        }),
+        tap(user => {
+          this.setCurrentUser(user);
+          localStorage.setItem('isGestionnaire', 'true');
+          console.log('✅ Gestionnaire configuré avec token:', localStorage.getItem('authToken'));
+        }),
+        catchError(this.handleGestionnaireError)
+      );
+  }
+
+  /**
+   * Déconnexion gestionnaire spécifique
+   */
+  logoutGestionnaire(): void {
+    localStorage.removeItem('isGestionnaire');
+    this.logout();
+  }
+
+  /**
+   * Vérifier si l'utilisateur est un gestionnaire de ville
+   */
+  isGestionnaire(): boolean {
+    const user = this.getCurrentUser();
+    const isGestionnaireFlag = localStorage.getItem('isGestionnaire') === 'true';
+    return user ? (user.role === 'GESTIONNAIRE_VILLE' && isGestionnaireFlag) : false;
   }
 
   /**
@@ -356,6 +436,44 @@ export class AuthService {
     }
 
     console.error('Erreur AuthService Admin:', error);
+    return throwError(() => new Error(errorMessage));
+  };
+
+  /**
+   * Gestion d'erreur pour les gestionnaires de ville
+   */
+
+  private handleGestionnaireError = (error: HttpErrorResponse): Observable<never> => {
+    let errorMessage = 'Une erreur est survenue lors de la connexion gestionnaire';
+
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `Erreur: ${error.error.message}`;
+    } else {
+      switch (error.status) {
+        case 400:
+          errorMessage = 'Email, mot de passe et code gestionnaire requis';
+          break;
+        case 401:
+          errorMessage = 'Identifiants gestionnaire invalides';
+          break;
+        case 403:
+          errorMessage = 'Accès refusé - Droits gestionnaire insuffisants';
+          break;
+        case 422:
+          errorMessage = 'Le code gestionnaire doit contenir exactement 4 chiffres';
+          break;
+        case 500:
+          errorMessage = 'Erreur serveur - Contactez le support technique';
+          break;
+        case 0:
+          errorMessage = 'Impossible de contacter le serveur d\'authentification';
+          break;
+        default:
+          errorMessage = `Erreur ${error.status}: ${error.error?.error || error.message}`;
+      }
+    }
+
+    console.error('Erreur AuthService Gestionnaire:', error);
     return throwError(() => new Error(errorMessage));
   };
 }

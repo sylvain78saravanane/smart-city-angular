@@ -133,6 +133,7 @@ export class AdminCodeGuard implements CanActivate {
   }
 }
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -161,7 +162,6 @@ export class CitoyenGuard implements CanActivate {
       })
     );
   }
-
   private redirectBasedOnRole(role: string): void {
     switch (role) {
       case 'ADMINISTRATEUR':
@@ -175,6 +175,66 @@ export class CitoyenGuard implements CanActivate {
         break;
       default:
         this.router.navigate(['/']);
+    }
+  }
+}
+
+/**
+ * GestionnaireGuard
+ */
+@Injectable({
+  providedIn: 'root'
+})
+export class GestionnaireGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | boolean {
+    return this.authService.currentUser$.pipe(
+      take(1),
+      map(user => {
+        // Vérifier si l'utilisateur est connecté et est un gestionnaire
+        if (user && user.role === 'GESTIONNAIRE_VILLE' && this.authService.isGestionnaire()) {
+          return true;
+        }
+
+        // Si l'utilisateur est connecté mais pas gestionnaire
+        if (user) {
+          this.redirectBasedOnRole(user.role);
+        } else {
+          // Pas connecté, rediriger vers la page de connexion gestionnaire
+          this.router.navigate(['/login/gestionnaire'], {
+            queryParams: { returnUrl: state.url, message: 'Accès gestionnaire requis' }
+          });
+        }
+        return false;
+      })
+    );
+  }
+
+  private redirectBasedOnRole(role: string): void {
+    switch (role) {
+      case 'CITOYEN':
+        this.router.navigate(['/dashboard']);
+        break;
+      case 'ADMINISTRATEUR':
+        this.router.navigate(['/dashboard/administrateur']);
+        break;
+      case 'CHERCHEUR':
+        this.router.navigate(['/dashboard/chercheur']);
+        break;
+      default:
+        this.router.navigate(['/login'], {
+          queryParams: {
+            error: 'Accès refusé - Droits gestionnaire requis',
+            returnUrl: '/login/gestionnaire'
+          }
+        });
     }
   }
 }

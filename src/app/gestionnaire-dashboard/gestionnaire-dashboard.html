@@ -1,0 +1,479 @@
+<!-- src/app/gestionnaire-dashboard/gestionnaire-dashboard.html -->
+
+<app-header></app-header>
+
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 p-4">
+  <div class="container mx-auto max-w-7xl">
+
+    <!-- En-tête du dashboard gestionnaire -->
+    <div class="mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+              <mat-icon class="mr-3 text-green-600 text-4xl">business</mat-icon>
+              Tableau de Bord Gestionnaire
+            </h1>
+            <p class="text-gray-600 mb-2">
+              Bienvenue {{ currentUser?.prenom }} {{ currentUser?.nom }}
+            </p>
+            <div class="text-sm text-green-600">
+              🏢 Département: {{ currentUser?.donneesSpecifiques?.nomDepartement || 'Non renseigné' }}
+            </div>
+          </div>
+          <div class="text-right">
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="logout()"
+              class="mb-2">
+              <mat-icon class="mr-2">logout</mat-icon>
+              Se déconnecter
+            </button>
+            <div class="text-xs text-gray-500">
+              Connecté en tant que {{ currentUser?.role }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistiques rapides -->
+        @if (!isLoading) {
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <div class="flex items-center">
+                <mat-icon class="text-green-600 mr-2">sensors</mat-icon>
+                <div>
+                  <div class="font-bold text-green-800">{{ getStatistiquesGlobales().capteursActifs }}</div>
+                  <div class="text-sm text-green-600">Capteurs actifs</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="flex items-center">
+                <mat-icon class="text-blue-600 mr-2">device_hub</mat-icon>
+                <div>
+                  <div class="font-bold text-blue-800">{{ getStatistiquesGlobales().totalCapteurs }}</div>
+                  <div class="text-sm text-blue-600">Total capteurs</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <div class="flex items-center">
+                <mat-icon class="text-orange-600 mr-2">thermostat</mat-icon>
+                <div>
+                  <div class="font-bold text-orange-800">{{ getStatistiquesGlobales().tempMoyenne }}°C</div>
+                  <div class="text-sm text-orange-600">Temp. moyenne</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <div class="flex items-center">
+                <mat-icon class="text-purple-600 mr-2">air</mat-icon>
+                <div>
+                  <div class="font-bold text-purple-800">{{ getStatistiquesGlobales().qualiteAirMoyenne }}</div>
+                  <div class="text-sm text-purple-600">Qualité air</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Bouton de rafraîchissement -->
+        <div class="mt-4 flex justify-end">
+          <button
+            mat-icon-button
+            (click)="refreshData()"
+            [disabled]="isLoading"
+            class="text-green-500"
+            title="Actualiser les données">
+            <mat-icon [class]="isLoading ? 'animate-spin' : ''">refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    @if (error && !isLoading) {
+      <div class="mb-8 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+        <div class="flex items-center">
+          <mat-icon class="text-red-400 mr-3">error</mat-icon>
+          <div>
+            <h3 class="font-medium text-red-800">Erreur de chargement</h3>
+            <p class="text-red-700 text-sm mt-1">{{ error }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Onglets du dashboard -->
+    <mat-tab-group class="mb-8">
+
+      <!-- Onglet Vue d'ensemble -->
+      <mat-tab label="Vue d'ensemble">
+        @if (isLoading) {
+          <div class="text-center py-12">
+            <mat-icon class="animate-spin text-4xl text-green-500 mb-4">refresh</mat-icon>
+            <div class="text-gray-600">Chargement des données...</div>
+          </div>
+        } @else if (mesCapteurs.length === 0) {
+          <div class="text-center py-12">
+            <mat-icon class="text-6xl text-gray-400 mb-4">sensors_off</mat-icon>
+            <div class="text-gray-600 text-lg">Aucun capteur assigné</div>
+            <p class="text-gray-500 mt-2">Contactez votre administrateur pour obtenir des capteurs</p>
+          </div>
+        } @else {
+          <!-- Grille des capteurs -->
+          <mat-grid-list [cols]="getGridCols()" rowHeight="300px" gutterSize="16" class="mt-6">
+            @for (capteur of mesCapteurs; track capteur.idCapteur) {
+              <mat-grid-tile>
+                <mat-card class="w-full h-full hover-azure">
+                  <mat-card-header>
+                    <mat-icon
+                      mat-card-avatar
+                      [style.background-color]="getStatutColor(capteur.statut)"
+                      class="text-white">
+                      {{ capteurService.getTypeCapteurIcon(capteur.typeCapteur) }}
+                    </mat-icon>
+                    <mat-card-title>{{ capteur.nomCapteur }}</mat-card-title>
+                    <mat-card-subtitle>{{ capteur.typeCapteur }} - {{ capteur.statut }}</mat-card-subtitle>
+                  </mat-card-header>
+
+                  <mat-card-content class="flex-1 flex flex-col justify-center">
+                    @if (getDonneesCapteur(capteur.idCapteur); as donnee) {
+                      <div class="text-center">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <div class="font-bold text-lg text-orange-600">
+                              {{ donnee.temperatureCelsius | number:'1.1-1' }}°C
+                            </div>
+                            <div class="text-gray-600">Température</div>
+                          </div>
+                          <div>
+                            <div class="font-bold text-lg text-blue-600">
+                              {{ donnee.humidite | number:'1.0-0' }}%
+                            </div>
+                            <div class="text-gray-600">Humidité</div>
+                          </div>
+                          <div>
+                            <div class="font-bold text-lg" [style.color]="getQualiteAirColor(donnee.qualiteAirResume)">
+                              {{ donnee.qualiteAirResume }}
+                            </div>
+                            <div class="text-gray-600">Qualité air</div>
+                          </div>
+                          <div>
+                            <div class="font-bold text-lg text-purple-600">
+                              {{ donnee.indiceUv | number:'1.0-0' }}
+                            </div>
+                            <div class="text-gray-600">Indice UV</div>
+                          </div>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="text-center text-gray-500">
+                        <mat-icon class="text-4xl mb-2">cloud_off</mat-icon>
+                        <div>Aucune donnée récente</div>
+                      </div>
+                    }
+                  </mat-card-content>
+
+                  <mat-card-actions>
+                    <button mat-button color="primary">Voir détails</button>
+                    <button
+                      mat-button
+                      color="accent"
+                      (click)="rapportForm.patchValue({capteurId: capteur.idCapteur})">
+                      Rapport
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+              </mat-grid-tile>
+            }
+          </mat-grid-list>
+        }
+      </mat-tab>
+
+      <!-- Onglet Tableau détaillé -->
+      <mat-tab label="Données détaillées">
+        @if (mesCapteurs.length > 0) {
+          <div class="mt-6">
+            <table mat-table [dataSource]="mesCapteurs" class="w-full">
+
+              <ng-container matColumnDef="nom">
+                <th mat-header-cell *matHeaderCellDef>Capteur</th>
+                <td mat-cell *matCellDef="let capteur">
+                  <div class="flex items-center">
+                    <mat-icon class="mr-2 text-gray-600">{{ capteurService.getTypeCapteurIcon(capteur.typeCapteur) }}</mat-icon>
+                    <div>
+                      <div class="font-medium">{{ capteur.nomCapteur }}</div>
+                      <div class="text-sm text-gray-500">{{ capteur.adresseInstallation || 'Adresse non renseignée' }}</div>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let capteur">{{ capteur.typeCapteur }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="statut">
+                <th mat-header-cell *matHeaderCellDef>Statut</th>
+                <td mat-cell *matCellDef="let capteur">
+                  <span
+                    class="px-2 py-1 rounded-full text-xs font-medium"
+                    [style.background-color]="getStatutColor(capteur.statut) + '20'"
+                    [style.color]="getStatutColor(capteur.statut)">
+                    {{ capteur.statut }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="temperature">
+                <th mat-header-cell *matHeaderCellDef>Température</th>
+                <td mat-cell *matCellDef="let capteur">
+                  @if (getDonneesCapteur(capteur.idCapteur); as donnee) {
+                    <span class="font-medium text-orange-600">
+                      {{ donnee.temperatureCelsius | number:'1.1-1' }}°C
+                    </span>
+                  } @else {
+                    <span class="text-gray-400">N/A</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="qualiteAir">
+                <th mat-header-cell *matHeaderCellDef>Qualité Air</th>
+                <td mat-cell *matCellDef="let capteur">
+                  @if (getDonneesCapteur(capteur.idCapteur); as donnee) {
+                    <span [style.color]="getQualiteAirColor(donnee.qualiteAirResume)">
+                      {{ donnee.qualiteAirResume }}
+                    </span>
+                  } @else {
+                    <span class="text-gray-400">N/A</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let capteur">
+                  <button mat-icon-button color="primary" title="Collecter données">
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="accent"
+                    title="Générer rapport"
+                    (click)="rapportForm.patchValue({capteurId: capteur.idCapteur})">
+                    <mat-icon>assessment</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        }
+      </mat-tab>
+
+      <!-- Onglet Génération de rapports -->
+      <mat-tab label="Rapports CSV">
+        <div class="mt-6 max-w-2xl">
+          <mat-card>
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="bg-green-500 text-white">assessment</mat-icon>
+              <mat-card-title>Générer un Rapport CSV</mat-card-title>
+              <mat-card-subtitle>Exportez les données IoT pour analyse</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form [formGroup]="rapportForm" (ngSubmit)="genererRapport()" class="space-y-4">
+
+                <!-- Sélection du capteur -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Capteur</mat-label>
+                  <mat-select formControlName="capteurId">
+                    @for (capteur of mesCapteurs; track capteur.idCapteur) {
+                      <mat-option [value]="capteur.idCapteur">
+                        {{ capteur.nomCapteur }} ({{ capteur.typeCapteur }})
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>sensors</mat-icon>
+                </mat-form-field>
+
+                <!-- Date de début -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Date de début</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="dateDebut"
+                    formControlName="dateDebut">
+                  <mat-icon matPrefix>date_range</mat-icon>
+                  <mat-datepicker-toggle matSuffix [for]="dateDebut"></mat-datepicker-toggle>
+                  <mat-datepicker #dateDebut></mat-datepicker>
+                </mat-form-field>
+
+                <!-- Date de fin -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Date de fin</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="dateFin"
+                    formControlName="dateFin">
+                  <mat-icon matPrefix>date_range</mat-icon>
+                  <mat-datepicker-toggle matSuffix [for]="dateFin"></mat-datepicker-toggle>
+                  <mat-datepicker #dateFin></mat-datepicker>
+                </mat-form-field>
+
+                <!-- Format de fichier -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Format</mat-label>
+                  <mat-select formControlName="format">
+                    <mat-option value="CSV">CSV (Excel)</mat-option>
+                    <mat-option value="JSON">JSON</mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>file_download</mat-icon>
+                </mat-form-field>
+
+                <!-- Bouton de génération -->
+                <div class="flex justify-center mt-6">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    type="submit"
+                    [disabled]="rapportForm.invalid || isGeneratingReport"
+                    class="w-full max-w-xs">
+                    @if (isGeneratingReport) {
+                      <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+                      <span>Génération...</span>
+                    } @else {
+                      <mat-icon class="mr-2">download</mat-icon>
+                      <span>Générer le rapport</span>
+                    }
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+
+    <!-- Section des alertes et notifications -->
+    @if (!isLoading && mesCapteurs.length > 0) {
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <mat-icon class="mr-2 text-yellow-500">notifications</mat-icon>
+          Alertes et Notifications de mes Capteurs
+        </h2>
+
+        <div class="space-y-3">
+          <!-- Alertes dynamiques basées sur les données -->
+          @for (capteur of mesCapteurs; track capteur.idCapteur) {
+            @if (getDonneesCapteur(capteur.idCapteur); as donnee) {
+
+              <!-- Alerte température élevée -->
+              @if (donnee.temperatureCelsius > 30) {
+                <div class="flex items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+                  <mat-icon class="text-orange-600 mr-3">thermostat</mat-icon>
+                  <div class="flex-1">
+                    <div class="font-medium text-gray-800">Température élevée - {{ capteur.nomCapteur }}</div>
+                    <div class="text-sm text-gray-600">
+                      {{ donnee.temperatureCelsius | number:'1.1-1' }}°C détectée - Surveillance recommandée
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Alerte qualité air dégradée -->
+              @if (donnee.pm10 > 50) {
+                <div class="flex items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+                  <mat-icon class="text-red-600 mr-3">warning</mat-icon>
+                  <div class="flex-1">
+                    <div class="font-medium text-gray-800">Qualité de l'air dégradée - {{ capteur.nomCapteur }}</div>
+                    <div class="text-sm text-gray-600">
+                      PM10: {{ donnee.pm10 | number:'1.1-1' }} μg/m³ - Mesures préventives recommandées
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Alerte UV élevé -->
+              @if (donnee.indiceUv > 7) {
+                <div class="flex items-center p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+                  <mat-icon class="text-purple-600 mr-3">wb_sunny</mat-icon>
+                  <div class="flex-1">
+                    <div class="font-medium text-gray-800">Indice UV élevé - {{ capteur.nomCapteur }}</div>
+                    <div class="text-sm text-gray-600">
+                      Indice {{ donnee.indiceUv | number:'1.0-0' }} - Protection solaire nécessaire
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          }
+
+          <!-- Capteurs inactifs -->
+          @for (capteur of mesCapteurs; track capteur.idCapteur) {
+            @if (capteur.statut !== 'ACTIF') {
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+                <mat-icon class="text-gray-600 mr-3">sensors_off</mat-icon>
+                <div class="flex-1">
+                  <div class="font-medium text-gray-800">Capteur {{ capteur.statut.toLowerCase() }} - {{ capteur.nomCapteur }}</div>
+                  <div class="text-sm text-gray-600">
+                    Intervention technique requise - Contactez le service maintenance
+                  </div>
+                </div>
+              </div>
+            }
+          }
+
+          <!-- Message par défaut si aucune alerte -->
+          @if (tousSyCtemesNormaux()) {
+            <div class="flex items-center p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+              <mat-icon class="text-green-600 mr-3">check_circle</mat-icon>
+              <div class="flex-1">
+                <div class="font-medium text-gray-800">Tous les systèmes fonctionnent normalement</div>
+                <div class="text-sm text-gray-600">
+                  Aucune alerte détectée sur vos capteurs - Surveillance continue active
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Actions rapides -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-green-500">add_circle</mat-icon>
+        <span>Nouveau capteur</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-blue-500">analytics</mat-icon>
+        <span>Analyses avancées</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-orange-500">settings</mat-icon>
+        <span>Configuration</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="refreshData()">
+        <mat-icon class="text-2xl text-purple-500">refresh</mat-icon>
+        <span>Actualiser tout</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>
