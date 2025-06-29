@@ -1,3 +1,5 @@
+// src/app/gestionnaire-dashboard/gestionnaire-dashboard.ts - Version avec rapports intégrés
+
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {MatCardModule} from '@angular/material/card';
@@ -23,6 +25,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {MatTableModule} from '@angular/material/table';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {CapteurDisponible, RapportGestionnaireService} from '../services/rapport-gestionnaire-service';
 
 @Component({
   selector: 'app-gestionnaire-dashboard',
@@ -63,10 +66,21 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
   rapportForm: FormGroup;
   isGeneratingReport = false;
 
+  // Nouveau: Variables pour les rapports intégrés
+  tousLesCapteurs: CapteurDisponible[] = [];
+  rapportIntegreForm: FormGroup;
+  isLoadingCapteurs = false;
+  nombreDonneesRapport = 0;
+  capteurSelectionneRapport: CapteurDisponible | null = null;
+
+  // Configuration des dates pour les rapports
+  maxDateRapport = new Date();
+  minDateRapport = new Date(2020, 0, 1);
+
   // Subscriptions
   private dataSubscription?: Subscription;
-  private refreshInterval?: number; // Pour stocker l'ID du setInterval
-  private readonly REFRESH_INTERVAL = 60000; // 1 minute pour gestionnaire
+  private refreshInterval?: number;
+  private readonly REFRESH_INTERVAL = 60000;
 
   // Colonnes du tableau
   displayedColumns: string[] = ['nom', 'type', 'statut', 'temperature', 'qualiteAir', 'actions'];
@@ -77,13 +91,30 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     public capteurService: CapteurService,
     private donneeIoTService: DonneeIoTService,
     private snackBar: MatSnackBar,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private rapportGestionnaireService: RapportGestionnaireService // Nouveau service
   ) {
     this.rapportForm = this.fb.group({
       capteurId: ['', Validators.required],
       dateDebut: ['', Validators.required],
       dateFin: ['', Validators.required],
       format: ['CSV', Validators.required]
+    });
+
+    // Nouveau formulaire pour rapports intégrés
+    this.rapportIntegreForm = this.fb.group({
+      capteurId: ['', Validators.required],
+      dateDebut: ['', Validators.required],
+      dateFin: ['', Validators.required]
+    });
+
+    // Définir des dates par défaut (7 derniers jours)
+    const maintenant = new Date();
+    const septJoursAvant = new Date(maintenant.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    this.rapportIntegreForm.patchValue({
+      dateDebut: septJoursAvant,
+      dateFin: maintenant
     });
   }
 
@@ -97,6 +128,10 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
 
     this.loadMesCapteurs();
     this.startDataRefresh();
+
+    // Nouveau: Charger tous les capteurs pour les rapports
+    this.chargerTousLesCapteurs();
+    this.ecouterChangementsRapport();
   }
 
   ngOnDestroy() {
@@ -108,18 +143,16 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Charger les capteurs gérés par ce gestionnaire
-   */
+  // ========== MÉTHODES EXISTANTES (inchangées) ==========
+
   loadMesCapteurs() {
     this.isLoading = true;
 
     if (!this.currentUser) return;
 
-    // ✅ CORRECTION: Utiliser l'endpoint spécifique pour les capteurs du gestionnaire
     this.capteurService.getCapteursByGestionnaire(this.currentUser.idUtilisateur).subscribe({
       next: (response) => {
-        this.mesCapteurs = response.capteurs || []; // Gérer le cas où capteurs est undefined
+        this.mesCapteurs = response.capteurs || [];
         console.log('📊 Capteurs gérés par ce gestionnaire:', this.mesCapteurs);
 
         if (this.mesCapteurs.length === 0) {
@@ -128,7 +161,6 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
           return;
         }
 
-        // Charger les données pour chaque capteur
         this.loadDonneesPourTousLesCapteurs();
       },
       error: (error) => {
@@ -143,9 +175,6 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Charger les dernières données pour tous les capteurs
-   */
   loadDonneesPourTousLesCapteurs() {
     if (this.mesCapteurs.length === 0) {
       this.isLoading = false;
@@ -180,18 +209,12 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Démarrer le rafraîchissement automatique
-   */
   startDataRefresh() {
     this.refreshInterval = setInterval(() => {
       this.loadDonneesPourTousLesCapteurs();
     }, this.REFRESH_INTERVAL);
   }
 
-  /**
-   * Rafraîchir manuellement
-   */
   refreshData() {
     this.loadMesCapteurs();
     this.snackBar.open('Données actualisées', 'Fermer', {
@@ -200,9 +223,185 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     });
   }
 
+  // ========== NOUVELLES MÉTHODES POUR RAPPORTS INTÉGRÉS ==========
+
   /**
-   * Générer un rapport CSV
+   * Charger tous les capteurs disponibles pour les rapports
    */
+  chargerTousLesCapteurs() {
+    this.isLoadingCapteurs = true;
+
+    this.rapportGestionnaireService.getCapteursDisponibles().subscribe({
+      next: (response) => {
+        this.tousLesCapteurs = response.capteurs;
+        console.log('📋 Tous les capteurs chargés pour rapports:', this.tousLesCapteurs.length);
+        this.isLoadingCapteurs = false;
+      },
+      error: (error) => {
+        console.error('❌ Erreur chargement tous capteurs:', error);
+        this.snackBar.open('Erreur lors du chargement des capteurs', 'Fermer', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoadingCapteurs = false;
+      }
+    });
+  }
+
+  /**
+   * Écouter les changements dans le formulaire de rapport
+   */
+  ecouterChangementsRapport() {
+    // Changement de capteur
+    this.rapportIntegreForm.get('capteurId')?.valueChanges.subscribe(capteurId => {
+      this.capteurSelectionneRapport = this.tousLesCapteurs.find(c => c.idCapteur === capteurId) || null;
+      this.verifierDisponibiliteDonneesRapport();
+    });
+
+    // Changements de dates
+    this.rapportIntegreForm.get('dateDebut')?.valueChanges.subscribe(() => {
+      this.verifierDisponibiliteDonneesRapport();
+    });
+
+    this.rapportIntegreForm.get('dateFin')?.valueChanges.subscribe(() => {
+      this.verifierDisponibiliteDonneesRapport();
+    });
+  }
+
+  /**
+   * Vérifier la disponibilité des données pour le rapport
+   */
+  verifierDisponibiliteDonneesRapport() {
+    const formValue = this.rapportIntegreForm.value;
+
+    if (formValue.capteurId && formValue.dateDebut && formValue.dateFin) {
+      // Valider la période
+      const erreurPeriode = this.rapportGestionnaireService.validerPeriode(formValue.dateDebut, formValue.dateFin);
+      if (erreurPeriode) {
+        this.nombreDonneesRapport = 0;
+        return;
+      }
+
+      // Compter les données disponibles
+      const dateDebut = this.rapportGestionnaireService.formatDateForAPI(formValue.dateDebut);
+      const dateFin = this.rapportGestionnaireService.formatDateForAPI(formValue.dateFin);
+
+      this.rapportGestionnaireService.compterDonneesPeriode(formValue.capteurId, dateDebut, dateFin).subscribe({
+        next: (response) => {
+          this.nombreDonneesRapport = response.nombre_donnees;
+        },
+        error: (error) => {
+          console.error('❌ Erreur comptage données rapport:', error);
+          this.nombreDonneesRapport = 0;
+        }
+      });
+    } else {
+      this.nombreDonneesRapport = 0;
+    }
+  }
+
+  /**
+   * Définir une période prédéfinie pour le rapport
+   */
+  definirPeriodeRapport(jours: number) {
+    const maintenant = new Date();
+    const debut = new Date(maintenant.getTime() - jours * 24 * 60 * 60 * 1000);
+
+    this.rapportIntegreForm.patchValue({
+      dateDebut: debut,
+      dateFin: maintenant
+    });
+  }
+
+  /**
+   * Générer et télécharger le rapport CSV intégré
+   */
+  genererRapportIntegre() {
+    if (this.rapportIntegreForm.valid && this.capteurSelectionneRapport) {
+      this.isGeneratingReport = true;
+
+      const formValue = this.rapportIntegreForm.value;
+      const dateDebut = this.rapportGestionnaireService.formatDateForAPI(formValue.dateDebut);
+      const dateFin = this.rapportGestionnaireService.formatDateForAPI(formValue.dateFin);
+
+      console.log('🔄 Génération rapport intégré pour:', {
+        capteur: this.capteurSelectionneRapport.nomCapteur,
+        dateDebut,
+        dateFin,
+        nombreDonnees: this.nombreDonneesRapport
+      });
+
+      this.rapportGestionnaireService.telechargerEtSauvegarderCSV(
+        formValue.capteurId,
+        dateDebut,
+        dateFin,
+        this.capteurSelectionneRapport.nomCapteur
+      ).subscribe({
+        next: () => {
+          this.snackBar.open(
+            `✅ Rapport CSV téléchargé ! (${this.nombreDonneesRapport} données exportées)`,
+            'Fermer',
+            {
+              duration: 5000,
+              panelClass: ['success-snackbar']
+            }
+          );
+          this.isGeneratingReport = false;
+        },
+        error: (error) => {
+          console.error('❌ Erreur génération rapport intégré:', error);
+          this.snackBar.open(
+            '❌ Erreur: ' + error.message,
+            'Fermer',
+            {
+              duration: 7000,
+              panelClass: ['error-snackbar']
+            }
+          );
+          this.isGeneratingReport = false;
+        }
+      });
+    } else {
+      this.snackBar.open('⚠️ Veuillez remplir tous les champs du rapport', 'Fermer', {
+        duration: 3000,
+        panelClass: ['warning-snackbar']
+      });
+    }
+  }
+
+  /**
+   * Obtenir l'icône du type de capteur pour rapports
+   */
+  getIconeCapteurRapport(type: string): string {
+    switch (type) {
+      case 'TEMPERATURE': return 'thermostat';
+      case 'HUMIDITE': return 'water_drop';
+      case 'POLLUTION': return 'air';
+      case 'TRAFIC': return 'traffic';
+      case 'BRUIT': return 'volume_up';
+      case 'LUMINOSITE': return 'wb_sunny';
+      case 'PRESSION': return 'speed';
+      case 'VENT': return 'air';
+      case 'PLUIE': return 'umbrella';
+      default: return 'sensors';
+    }
+  }
+
+  /**
+   * Obtenir la couleur du statut pour rapports
+   */
+  getCouleurStatutRapport(statut: string): string {
+    switch (statut) {
+      case 'ACTIF': return '#22c55e';
+      case 'INACTIF': return '#6b7280';
+      case 'MAINTENANCE': return '#f59e0b';
+      case 'DEFAILLANT': return '#ef4444';
+      default: return '#6b7280';
+    }
+  }
+
+  // ========== MÉTHODES EXISTANTES (inchangées) ==========
+
   genererRapport() {
     if (this.rapportForm.valid) {
       this.isGeneratingReport = true;
@@ -240,9 +439,6 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Générer et télécharger le fichier CSV
-   */
   private generateCSVFile(donnees: DonneeIoTDTO[], capteurId: number) {
     const capteur = this.mesCapteurs.find(c => c.idCapteur === capteurId);
     const csvContent = this.convertToCSV(donnees);
@@ -261,9 +457,6 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Convertir les données en format CSV
-   */
   private convertToCSV(donnees: DonneeIoTDTO[]): string {
     const headers = [
       'Date/Heure',
@@ -305,37 +498,22 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     return csvRows.join('\n');
   }
 
-  /**
-   * Formater la date pour l'API
-   */
   private formatDateForAPI(date: Date): string {
     return date.toISOString().slice(0, 19);
   }
 
-  /**
-   * Obtenir la couleur du statut capteur
-   */
   getStatutColor(statut: string): string {
     return this.capteurService.getStatutColor(statut);
   }
 
-  /**
-   * Obtenir les données d'un capteur
-   */
   getDonneesCapteur(capteurId: number): DonneeIoTDTO | null {
     return this.donneesSynthese[capteurId] || null;
   }
 
-  /**
-   * Obtenir la couleur de la qualité de l'air
-   */
   getQualiteAirColor(qualite: string): string {
     return this.donneeIoTService.getQualiteAirColor(qualite);
   }
 
-  /**
-   * Obtenir le résumé des statistiques
-   */
   getStatistiquesGlobales() {
     const capteursActifs = this.mesCapteurs.filter(c => c.statut === 'ACTIF').length;
     const tempMoyenne = this.calculateAverageTemperature();
@@ -361,7 +539,6 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     const donnees = Object.values(this.donneesSynthese);
     if (donnees.length === 0) return 'N/A';
 
-    // Logique simplifiée pour déterminer la qualité globale
     const pm10Moyen = donnees.reduce((acc, donnee) => acc + donnee.pm10, 0) / donnees.length;
 
     if (pm10Moyen <= 20) return 'Bonne';
@@ -375,9 +552,6 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     this.router.navigate(['/login/gestionnaire']);
   }
 
-  /**
-   * Vérifier si tous les systèmes fonctionnent normalement
-   */
   tousSyCtemesNormaux(): boolean {
     const capteursActifs = this.mesCapteurs.every(capteur => capteur.statut === 'ACTIF');
     const donneesNormales = Object.values(this.donneesSynthese).every(donnee =>
@@ -386,16 +560,10 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     return capteursActifs && donneesNormales && this.mesCapteurs.length > 0;
   }
 
-  /**
-   * Vérifier s'il y a des capteurs inactifs
-   */
   hasCapteursInactifs(): boolean {
     return this.mesCapteurs.some(capteur => capteur.statut !== 'ACTIF');
   }
 
-  /**
-   * Vérifier s'il y a des alertes de données
-   */
   hasAlertesDecnnees(): boolean {
     return Object.values(this.donneesSynthese).some(donnee =>
       donnee.temperatureCelsius > 30 || donnee.pm10 > 50 || donnee.indiceUv > 7
@@ -409,3 +577,5 @@ export class GestionnaireDashboard implements OnInit, OnDestroy {
     return 3;
   }
 }
+
+

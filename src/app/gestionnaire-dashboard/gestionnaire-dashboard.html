@@ -184,7 +184,7 @@
                     <button
                       mat-button
                       color="accent"
-                      (click)="rapportForm.patchValue({capteurId: capteur.idCapteur})">
+                      (click)="rapportIntegreForm.patchValue({capteurId: capteur.idCapteur})">
                       Rapport
                     </button>
                   </mat-card-actions>
@@ -267,7 +267,7 @@
                     mat-icon-button
                     color="accent"
                     title="Générer rapport"
-                    (click)="rapportForm.patchValue({capteurId: capteur.idCapteur})">
+                    (click)="rapportIntegreForm.patchValue({capteurId: capteur.idCapteur})">
                     <mat-icon>assessment</mat-icon>
                   </button>
                 </td>
@@ -280,86 +280,272 @@
         }
       </mat-tab>
 
-      <!-- Onglet Génération de rapports -->
+      <!-- Onglet Génération de rapports CSV - TOUS LES CAPTEURS -->
       <mat-tab label="Rapports CSV">
-        <div class="mt-6 max-w-2xl">
-          <mat-card>
-            <mat-card-header>
-              <mat-icon mat-card-avatar class="bg-green-500 text-white">assessment</mat-icon>
-              <mat-card-title>Générer un Rapport CSV</mat-card-title>
-              <mat-card-subtitle>Exportez les données IoT pour analyse</mat-card-subtitle>
-            </mat-card-header>
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            <mat-card-content>
-              <form [formGroup]="rapportForm" (ngSubmit)="genererRapport()" class="space-y-4">
+          <!-- Colonne 1: Formulaire de rapport -->
+          <div>
+            <mat-card>
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="bg-green-500 text-white">assessment</mat-icon>
+                <mat-card-title>Rapport CSV - Tous les Capteurs</mat-card-title>
+                <mat-card-subtitle>Exportez les données de n'importe quel capteur (admin + gestionnaire)</mat-card-subtitle>
+              </mat-card-header>
 
-                <!-- Sélection du capteur -->
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Capteur</mat-label>
-                  <mat-select formControlName="capteurId">
-                    @for (capteur of mesCapteurs; track capteur.idCapteur) {
-                      <mat-option [value]="capteur.idCapteur">
-                        {{ capteur.nomCapteur }} ({{ capteur.typeCapteur }})
-                      </mat-option>
-                    }
-                  </mat-select>
-                  <mat-icon matPrefix>sensors</mat-icon>
-                </mat-form-field>
+              <mat-card-content>
+                <form [formGroup]="rapportIntegreForm" (ngSubmit)="genererRapportIntegre()" class="space-y-4">
 
-                <!-- Date de début -->
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Date de début</mat-label>
-                  <input
-                    matInput
-                    [matDatepicker]="dateDebut"
-                    formControlName="dateDebut">
-                  <mat-icon matPrefix>date_range</mat-icon>
-                  <mat-datepicker-toggle matSuffix [for]="dateDebut"></mat-datepicker-toggle>
-                  <mat-datepicker #dateDebut></mat-datepicker>
-                </mat-form-field>
+                  <!-- Sélection du capteur parmi TOUS les capteurs -->
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Capteur à analyser</mat-label>
+                    <mat-select formControlName="capteurId" [disabled]="isLoadingCapteurs">
+                      @if (isLoadingCapteurs) {
+                        <mat-option disabled>
+                          <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+                          Chargement des capteurs...
+                        </mat-option>
+                      } @else {
+                        @for (capteur of tousLesCapteurs; track capteur.idCapteur) {
+                          <mat-option [value]="capteur.idCapteur">
+                            <div class="flex items-center">
+                              <mat-icon
+                                class="mr-2 text-sm"
+                                [style.color]="getCouleurStatutRapport(capteur.statut)">
+                                {{ getIconeCapteurRapport(capteur.typeCapteur) }}
+                              </mat-icon>
+                              <div>
+                                <div class="font-medium">{{ capteur.nomCapteur }}</div>
+                                <div class="text-xs text-gray-500">
+                                  {{ capteur.typeCapteur }} • {{ capteur.statut }} • {{ capteur.gestionnaire }}
+                                </div>
+                              </div>
+                            </div>
+                          </mat-option>
+                        }
+                      }
+                    </mat-select>
+                    <mat-icon matPrefix>sensors</mat-icon>
+                    <mat-hint>{{ tousLesCapteurs.length }} capteurs disponibles</mat-hint>
+                  </mat-form-field>
 
-                <!-- Date de fin -->
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Date de fin</mat-label>
-                  <input
-                    matInput
-                    [matDatepicker]="dateFin"
-                    formControlName="dateFin">
-                  <mat-icon matPrefix>date_range</mat-icon>
-                  <mat-datepicker-toggle matSuffix [for]="dateFin"></mat-datepicker-toggle>
-                  <mat-datepicker #dateFin></mat-datepicker>
-                </mat-form-field>
+                  <!-- Boutons de période rapide -->
+                  <div class="flex flex-wrap gap-2 mb-4">
+                    <button
+                      type="button"
+                      mat-button
+                      (click)="definirPeriodeRapport(1)"
+                      class="text-sm">
+                      Dernières 24h
+                    </button>
+                    <button
+                      type="button"
+                      mat-button
+                      (click)="definirPeriodeRapport(7)"
+                      class="text-sm">
+                      7 derniers jours
+                    </button>
+                    <button
+                      type="button"
+                      mat-button
+                      (click)="definirPeriodeRapport(30)"
+                      class="text-sm">
+                      30 derniers jours
+                    </button>
+                    <button
+                      type="button"
+                      mat-button
+                      (click)="definirPeriodeRapport(90)"
+                      class="text-sm">
+                      3 derniers mois
+                    </button>
+                  </div>
 
-                <!-- Format de fichier -->
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Format</mat-label>
-                  <mat-select formControlName="format">
-                    <mat-option value="CSV">CSV (Excel)</mat-option>
-                    <mat-option value="JSON">JSON</mat-option>
-                  </mat-select>
-                  <mat-icon matPrefix>file_download</mat-icon>
-                </mat-form-field>
+                  <!-- Date de début -->
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Date de début</mat-label>
+                    <input
+                      matInput
+                      [matDatepicker]="dateDebutRapport"
+                      formControlName="dateDebut"
+                      [max]="maxDateRapport"
+                      [min]="minDateRapport"
+                      readonly>
+                    <mat-icon matPrefix>date_range</mat-icon>
+                    <mat-datepicker-toggle matSuffix [for]="dateDebutRapport"></mat-datepicker-toggle>
+                    <mat-datepicker #dateDebutRapport></mat-datepicker>
+                  </mat-form-field>
 
-                <!-- Bouton de génération -->
-                <div class="flex justify-center mt-6">
-                  <button
-                    mat-raised-button
-                    color="primary"
-                    type="submit"
-                    [disabled]="rapportForm.invalid || isGeneratingReport"
-                    class="w-full max-w-xs">
-                    @if (isGeneratingReport) {
-                      <mat-spinner diameter="20" class="mr-2"></mat-spinner>
-                      <span>Génération...</span>
-                    } @else {
-                      <mat-icon class="mr-2">download</mat-icon>
-                      <span>Générer le rapport</span>
-                    }
-                  </button>
+                  <!-- Date de fin -->
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Date de fin</mat-label>
+                    <input
+                      matInput
+                      [matDatepicker]="dateFinRapport"
+                      formControlName="dateFin"
+                      [max]="maxDateRapport"
+                      [min]="minDateRapport"
+                      readonly>
+                    <mat-icon matPrefix>date_range</mat-icon>
+                    <mat-datepicker-toggle matSuffix [for]="dateFinRapport"></mat-datepicker-toggle>
+                    <mat-datepicker #dateFinRapport></mat-datepicker>
+                  </mat-form-field>
+
+                  <!-- Information sur les données disponibles -->
+                  @if (nombreDonneesRapport > 0) {
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div class="flex items-center">
+                        <mat-icon class="text-green-600 mr-2">check_circle</mat-icon>
+                        <div>
+                          <div class="font-medium text-green-800">
+                            {{ nombreDonneesRapport }} données disponibles
+                          </div>
+                          <div class="text-sm text-green-700">
+                            Prêt pour l'export CSV
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  } @else if (rapportIntegreForm.get('capteurId')?.value && rapportIntegreForm.get('dateDebut')?.value && rapportIntegreForm.get('dateFin')?.value) {
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                      <div class="flex items-center">
+                        <mat-icon class="text-orange-600 mr-2">warning</mat-icon>
+                        <div>
+                          <div class="font-medium text-orange-800">
+                            Aucune donnée trouvée
+                          </div>
+                          <div class="text-sm text-orange-700">
+                            Essayez une autre période
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Bouton de génération -->
+                  <div class="flex justify-center mt-6">
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      type="submit"
+                      [disabled]="rapportIntegreForm.invalid || isGeneratingReport || nombreDonneesRapport === 0"
+                      class="w-full max-w-xs h-14 text-lg">
+                      @if (isGeneratingReport) {
+                        <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+                        <span>Génération...</span>
+                      } @else {
+                        <mat-icon class="mr-2">download</mat-icon>
+                        <span>Télécharger CSV</span>
+                      }
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Colonne 2: Informations -->
+          <div class="space-y-6">
+
+            <!-- Informations sur le capteur sélectionné -->
+            @if (capteurSelectionneRapport) {
+              <mat-card>
+                <mat-card-header>
+                  <mat-icon
+                    mat-card-avatar
+                    [style.background-color]="getCouleurStatutRapport(capteurSelectionneRapport.statut)"
+                    class="text-white">
+                    {{ getIconeCapteurRapport(capteurSelectionneRapport.typeCapteur) }}
+                  </mat-icon>
+                  <mat-card-title>{{ capteurSelectionneRapport.nomCapteur }}</mat-card-title>
+                  <mat-card-subtitle>Informations du capteur</mat-card-subtitle>
+                </mat-card-header>
+
+                <mat-card-content>
+                  <div class="space-y-3">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Type:</span>
+                      <span class="font-medium">{{ capteurSelectionneRapport.typeCapteur }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Statut:</span>
+                      <span
+                        class="px-2 py-1 rounded-full text-xs font-medium"
+                        [style.background-color]="getCouleurStatutRapport(capteurSelectionneRapport.statut) + '20'"
+                        [style.color]="getCouleurStatutRapport(capteurSelectionneRapport.statut)">
+                        {{ capteurSelectionneRapport.statut }}
+                      </span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Adresse:</span>
+                      <span class="font-medium text-right flex-1 ml-2">{{ capteurSelectionneRapport.adresse }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Gestionnaire:</span>
+                      <span class="font-medium">{{ capteurSelectionneRapport.gestionnaire }}</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            <!-- Informations sur le format CSV -->
+            <mat-card>
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="bg-blue-500 text-white">info</mat-icon>
+                <mat-card-title>Format d'Export CSV</mat-card-title>
+                <mat-card-subtitle>Données incluses dans le rapport</mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="text-sm space-y-2">
+                  <div class="font-medium text-gray-800 mb-3">Colonnes exportées :</div>
+
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">schedule</mat-icon>
+                      Date et Heure
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">sensors</mat-icon>
+                      Capteur & Type
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">location_on</mat-icon>
+                      Localisation
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">thermostat</mat-icon>
+                      Température
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">water_drop</mat-icon>
+                      Humidité
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">air</mat-icon>
+                      Qualité de l'air
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">wb_sunny</mat-icon>
+                      Météo complète
+                    </div>
+                    <div class="flex items-center">
+                      <mat-icon class="text-gray-500 mr-1 text-sm">verified</mat-icon>
+                      Statut & Source
+                    </div>
+                  </div>
+
+                  <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <div class="text-xs text-blue-800">
+                      <mat-icon class="text-blue-600 mr-1 text-sm">info</mat-icon>
+                      Le fichier CSV utilise le point-virgule (;) comme séparateur pour Excel français.
+                    </div>
+                  </div>
                 </div>
-              </form>
-            </mat-card-content>
-          </mat-card>
+              </mat-card-content>
+            </mat-card>
+          </div>
         </div>
       </mat-tab>
 
