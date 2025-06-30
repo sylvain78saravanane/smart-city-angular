@@ -14,11 +14,14 @@ import {Capteur} from './capteur/capteur';
 import {PageCommentaires} from './page-commentaires/page-commentaires';
 import {PageConnexionGestionnaire} from './page-connexion-gestionnaire/page-connexion-gestionnaire';
 import {GestionnaireDashboard} from './gestionnaire-dashboard/gestionnaire-dashboard';
+import {AlertesPersonnaliseesComponent} from './alertes-personnalisees-component/alertes-personnalisees-component';
 
 export const routes: Routes = [
   {path:'login', component: PageConnexion},
   {path:'', component: PageAccueil},
   {path: 'dashboard',component: CitoyenDashboard,canActivate: [CitoyenGuard]},
+  {path: 'dashboard/alertes-personnalisees', component:AlertesPersonnaliseesComponent, canActivate: [CitoyenGuard]},
+
   {path: 'dashboard/commentaires', component: PageCommentaires, canActivate: [CitoyenGuard]},
   {path: 'inscription', component: PageInscriptionCitoyen},
   {path: 'plan', component: PagePlan},

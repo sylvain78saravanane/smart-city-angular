@@ -336,6 +336,171 @@
       </div>
     }
 
+    <!-- Section Mes Alertes Personnalisées -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+          <mat-icon class="mr-2 text-purple-500">notifications_active</mat-icon>
+          Mes Alertes Personnalisées
+          @if (getNombreAlertesActives() > 0) {
+            <span class="ml-3 bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+          {{ getNombreAlertesActives() }} active{{ getNombreAlertesActives() > 1 ? 's' : '' }}
+        </span>
+          }
+        </h2>
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="goToAlertesPersonnalisees()"
+          class="btn-azure">
+          @if (showAlertesSection) {
+            <mat-icon class="mr-2">expand_less</mat-icon>
+            Masquer
+          } @else {
+            <mat-icon class="mr-2">tune</mat-icon>
+            Gérer mes alertes
+          }
+        </button>
+      </div>
+
+      <!-- Résumé des alertes -->
+      @if (!showAlertesSection) {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Carte résumé alertes actives -->
+          <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+            <div class="flex items-center">
+              <mat-icon class="text-green-600 mr-3 text-2xl">check_circle</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-green-800">{{ getNombreAlertesActives() }}</div>
+                <div class="text-sm text-green-700">Alerte{{ getNombreAlertesActives() > 1 ? 's' : '' }} active{{ getNombreAlertesActives() > 1 ? 's' : '' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carte alertes déclenchées -->
+          <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+            <div class="flex items-center">
+              <mat-icon class="text-orange-600 mr-3 text-2xl">warning</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-orange-800">{{ getAlertesDeeclenchees().length }}</div>
+                <div class="text-sm text-orange-700">Alerte{{ getAlertesDeeclenchees().length > 1 ? 's' : '' }} déclenchée{{ getAlertesDeeclenchees().length > 1 ? 's' : '' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton création rapide -->
+          <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+            <button
+              mat-button
+              (click)="goToAlertesPersonnalisees()"
+              class="w-full h-full text-left">
+              <div class="flex items-center">
+                <mat-icon class="text-blue-600 mr-3 text-2xl">add_alert</mat-icon>
+                <div>
+                  <div class="text-base font-medium text-blue-800">Créer une alerte</div>
+                  <div class="text-sm text-blue-700">Qualité air, canicule, UV...</div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alertes déclenchées en temps réel -->
+        @if (getAlertesDeeclenchees().length > 0) {
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold text-red-800 mb-3 flex items-center">
+              <mat-icon class="mr-2 text-red-600">campaign</mat-icon>
+              Alertes Déclenchées Maintenant !
+            </h3>
+
+            <div class="space-y-3">
+              @for (alerte of getAlertesDeeclenchees(); track alerte.idAlertePersonnalisee) {
+                <div class="flex items-center p-4 bg-red-50 rounded-lg border-l-4 border-red-500 alert-enter">
+                  <mat-icon class="text-red-600 mr-3 text-xl animate-pulse">{{ getIconeAlerte(alerte.typeAlerte) }}</mat-icon>
+                  <div class="flex-1">
+                    <div class="font-semibold text-red-800">{{ alerte.nomAlerte }}</div>
+                    <div class="text-sm text-red-700">
+                      {{ alerte.typeAlerteFormate }} - Seuil dépassé : {{ alerte.seuilFormate }}
+                      @switch (alerte.typeAlerte) {
+                        @case ('QUALITE_AIR') {
+                          <span class="font-medium">(Actuel: {{ donneeEnTempsReel?.pm10 | number:'1.1-1' }} μg/m³)</span>
+                        }
+                        @case ('CANICULE') {
+                          <span class="font-medium">(Actuel: {{ donneeEnTempsReel?.temperatureCelsius | number:'1.1-1' }}°C)</span>
+                        }
+                        @case ('INDICE_UV') {
+                          <span class="font-medium">(Actuel: {{ donneeEnTempsReel?.indiceUv | number:'1.0-0' }})</span>
+                        }
+                      }
+                    </div>
+                  </div>
+                  <mat-icon class="text-red-600 animate-pulse">notification_important</mat-icon>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Section complète des alertes personnalisées -->
+      @if (showAlertesSection) {
+        <div class="mt-6">
+          <app-alertes-personnalisees></app-alertes-personnalisees>
+        </div>
+      }
+    </div>
+
+    <!-- Modifier la section "Section Alertes Récentes" existante -->
+    <!-- Remplacer le titre par : -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <mat-icon class="mr-2 text-yellow-500">notifications</mat-icon>
+        Alertes Système et Conditions Actuelles
+      </h2>
+
+      <!-- Le reste du contenu existant reste identique -->
+      <div class="space-y-3">
+        <!-- ... contenu existant des alertes système ... -->
+      </div>
+    </div>
+
+    <!-- Dans la section "Actions Rapides", ajouter un nouveau bouton -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <!-- Boutons existants -->
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-blue-500">location_on</mat-icon>
+        <span>Capteurs près de moi</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-green-500">analytics</mat-icon>
+        <span>Historique des données</span>
+      </button>
+
+      <button
+        mat-stroked-button
+        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
+        (click)="goToCommentaires()">
+        <mat-icon class="text-2xl text-purple-500">comment</mat-icon>
+        <span>Espace Commentaires</span>
+      </button>
+
+      <!-- NOUVEAU : Bouton alertes personnalisées -->
+      <button
+        mat-stroked-button
+        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
+        (click)="goToAlertesPersonnalisees()">
+        <mat-icon class="text-2xl text-red-500">add_alert</mat-icon>
+        <span>Mes Alertes</span>
+        @if (getNombreAlertesActives() > 0) {
+          <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full ml-2">
+        {{ getNombreAlertesActives() }}
+      </span>
+        }
+      </button>
+    </div>
+
     <!-- Section Alertes Récentes -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
       <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">

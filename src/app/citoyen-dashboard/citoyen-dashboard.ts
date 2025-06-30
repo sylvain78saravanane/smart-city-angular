@@ -13,6 +13,8 @@ import { Footer } from '../footer/footer';
 import {DonneeIoTDTO, DonneeIoTService} from '../services/donnee-io-tservice';
 import {Subscription} from 'rxjs';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import {AlertePersonnaliseeService, ResponseAlertePersonnaliseeDTO} from '../services/alerte-personnalisee-service';
+import {AlertesPersonnaliseesComponent} from '../alertes-personnalisees-component/alertes-personnalisees-component';
 
 @Component({
   selector: 'app-citoyen-dashboard',
@@ -36,7 +38,8 @@ import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
     MatSnackBarModule,
     Footer,
     Header,
-    MatButton
+    MatButton,
+    AlertesPersonnaliseesComponent
   ],
   templateUrl: './citoyen-dashboard.html',
   styleUrl: './citoyen-dashboard.css'
@@ -49,6 +52,9 @@ export class CitoyenDashboard implements OnInit, OnDestroy {
   error: string | null = null;
   lastUpdate: Date | null = null;
 
+  alertesPersonnalisees: ResponseAlertePersonnaliseeDTO[] = [];
+  showAlertesSection = false;
+
   private dataSubscription?: Subscription;
   private readonly CAPTEUR_ID = 1; // ID du capteur de Tech City (Paris)
   private readonly REFRESH_INTERVAL = 30000; // 30 secondes
@@ -57,7 +63,8 @@ export class CitoyenDashboard implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private donneeIoTService: DonneeIoTService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private alertePersonnaliseeService: AlertePersonnaliseeService
   ) {}
 
   ngOnInit() {
@@ -69,6 +76,8 @@ export class CitoyenDashboard implements OnInit, OnDestroy {
       return;
     }
 
+    this.loadAlertesPersonnalisees();
+
     // Démarrer la récupération des données en temps réel
     this.startRealTimeDataFetching();
   }
@@ -77,6 +86,22 @@ export class CitoyenDashboard implements OnInit, OnDestroy {
     // Nettoyer les subscriptions
     if (this.dataSubscription) {
       this.dataSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Obtenir l'icône d'une alerte selon son type
+   */
+  getIconeAlerte(typeAlerte: string): string {
+    switch (typeAlerte) {
+      case 'QUALITE_AIR':
+        return 'air';
+      case 'CANICULE':
+        return 'thermostat';
+      case 'INDICE_UV':
+        return 'wb_sunny';
+      default:
+        return 'notifications';
     }
   }
 
@@ -267,4 +292,53 @@ export class CitoyenDashboard implements OnInit, OnDestroy {
   goToCommentaires() {
     this.router.navigate(['/dashboard/commentaires']);
   }
+
+  private loadAlertesPersonnalisees() {
+    if (!this.currentUser) return;
+
+    this.alertePersonnaliseeService.getAlertesActivesByCitoyen(this.currentUser.idUtilisateur).subscribe({
+      next: (response) => {
+        this.alertesPersonnalisees = response.alertes;
+        console.log('🔔 Alertes personnalisées chargées:', this.alertesPersonnalisees);
+      },
+      error: (error) => {
+        console.error('❌ Erreur lors du chargement des alertes personnalisées:', error);
+      }
+    });
+  }
+
+  goToAlertesPersonnalisees() {
+    this.showAlertesSection = !this.showAlertesSection;
+  }
+
+  hasAlertesActives(): boolean {
+    return this.alertesPersonnalisees.some(alerte => alerte.active);
+  }
+
+  getNombreAlertesActives(): number {
+    return this.alertesPersonnalisees.filter(alerte => alerte.active).length;
+  }
+
+  shouldTriggerAlert(alerte: ResponseAlertePersonnaliseeDTO): boolean {
+    if (!this.donneeEnTempsReel || !alerte.active) return false;
+
+    switch (alerte.typeAlerte) {
+      case 'QUALITE_AIR':
+        return alerte.seuilPM10 !== undefined &&
+          this.donneeEnTempsReel.pm10 >= alerte.seuilPM10;
+      case 'CANICULE':
+        return alerte.seuilTemperature !== undefined &&
+          this.donneeEnTempsReel.temperatureCelsius >= alerte.seuilTemperature;
+      case 'INDICE_UV':
+        return alerte.seuilUV !== undefined &&
+          this.donneeEnTempsReel.indiceUv >= alerte.seuilUV;
+      default:
+        return false;
+    }
+  }
+
+  getAlertesDeeclenchees(): ResponseAlertePersonnaliseeDTO[] {
+    return this.alertesPersonnalisees.filter(alerte => this.shouldTriggerAlert(alerte));
+  }
+
 }
