@@ -73,6 +73,46 @@
       </div>
     }
 
+    <!-- Actions Rapides -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" style="margin-bottom: 2pc">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-blue-500">location_on</mat-icon>
+        <span>Capteurs près de moi</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+        <mat-icon class="text-2xl text-green-500">analytics</mat-icon>
+        <span>Historique des données</span>
+      </button>
+
+      <button
+        mat-stroked-button
+        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
+        (click)="goToCommentaires()">
+        <mat-icon class="text-2xl text-purple-500">comment</mat-icon>
+        <span>Espace Commentaires</span>
+      </button>
+
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="refreshData()">
+        <mat-icon class="text-2xl text-orange-500">refresh</mat-icon>
+        <span>Actualiser maintenant</span>
+      </button>
+
+      <button
+        mat-stroked-button
+        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
+        (click)="goToAlertesPersonnalisees()">
+        <mat-icon class="text-2xl text-red-500">add_alert</mat-icon>
+        <span>Mes Alertes</span>
+        @if (getNombreAlertesActives() > 0) {
+          <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full ml-2">
+        {{ getNombreAlertesActives() }}
+      </span>
+        }
+      </button>
+
+    </div>
+
     <!-- Grille des données IoT en temps réel -->
     <mat-grid-list cols="1" rowHeight="320px" gutterSize="16"
                    [cols]="getGridCols()"
@@ -451,56 +491,6 @@
       }
     </div>
 
-    <!-- Modifier la section "Section Alertes Récentes" existante -->
-    <!-- Remplacer le titre par : -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-        <mat-icon class="mr-2 text-yellow-500">notifications</mat-icon>
-        Alertes Système et Conditions Actuelles
-      </h2>
-
-      <!-- Le reste du contenu existant reste identique -->
-      <div class="space-y-3">
-        <!-- ... contenu existant des alertes système ... -->
-      </div>
-    </div>
-
-    <!-- Dans la section "Actions Rapides", ajouter un nouveau bouton -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <!-- Boutons existants -->
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
-        <mat-icon class="text-2xl text-blue-500">location_on</mat-icon>
-        <span>Capteurs près de moi</span>
-      </button>
-
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
-        <mat-icon class="text-2xl text-green-500">analytics</mat-icon>
-        <span>Historique des données</span>
-      </button>
-
-      <button
-        mat-stroked-button
-        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
-        (click)="goToCommentaires()">
-        <mat-icon class="text-2xl text-purple-500">comment</mat-icon>
-        <span>Espace Commentaires</span>
-      </button>
-
-      <!-- NOUVEAU : Bouton alertes personnalisées -->
-      <button
-        mat-stroked-button
-        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
-        (click)="goToAlertesPersonnalisees()">
-        <mat-icon class="text-2xl text-red-500">add_alert</mat-icon>
-        <span>Mes Alertes</span>
-        @if (getNombreAlertesActives() > 0) {
-          <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full ml-2">
-        {{ getNombreAlertesActives() }}
-      </span>
-        }
-      </button>
-    </div>
-
     <!-- Section Alertes Récentes -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
       <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
@@ -559,39 +549,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Actions Rapides -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
-        <mat-icon class="text-2xl text-blue-500">location_on</mat-icon>
-        <span>Capteurs près de moi</span>
-      </button>
-
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
-        <mat-icon class="text-2xl text-green-500">analytics</mat-icon>
-        <span>Historique des données</span>
-      </button>
-
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="refreshData()">
-        <mat-icon class="text-2xl text-purple-500">refresh</mat-icon>
-        <span>Actualiser maintenant</span>
-      </button>
-
-      <button
-        mat-stroked-button
-        class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure"
-        (click)="goToCommentaires()">
-        <mat-icon class="text-2xl text-purple-500">comment</mat-icon>
-        <span>Espace Commentaires</span>
-      </button>
-
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="refreshData()">
-        <mat-icon class="text-2xl text-orange-500">refresh</mat-icon>
-        <span>Actualiser maintenant</span>
-      </button>
-
-    </div>
-
   </div>
 </div>
 
