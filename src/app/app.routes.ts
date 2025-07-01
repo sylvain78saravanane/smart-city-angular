@@ -16,6 +16,9 @@ import {PageConnexionGestionnaire} from './page-connexion-gestionnaire/page-conn
 import {GestionnaireDashboard} from './gestionnaire-dashboard/gestionnaire-dashboard';
 import {AlertesPersonnaliseesComponent} from './alertes-personnalisees-component/alertes-personnalisees-component';
 import {ChercheurDashboard} from './chercheur-dashboard/chercheur-dashboard';
+import {AdminListeUtilisateurs} from './admin-liste-utilisateurs/admin-liste-utilisateurs';
+import {AdminListeCapteurs} from './admin-liste-capteurs/admin-liste-capteurs';
+import {AdminPermissions} from './admin-permissions/admin-permissions';
 
 export const routes: Routes = [
   {path:'login', component: PageConnexion},
@@ -31,6 +34,8 @@ export const routes: Routes = [
   {path: 'login/administrateur', component: PageConnexionAdmin},
   {path: 'dashboard/administrateur', component: AdminDashboard},
   {path: 'dashboard/administrateur/capteur',component: Capteur},
+  {path: 'dashboard/administrateur/liste-utilisateurs', component:AdminListeUtilisateurs},
+  {path: 'dashboard/administrateur/permissions', component:AdminPermissions},
 
   {path: 'login/gestionnaire', component: PageConnexionGestionnaire},
   {path: 'dashboard/gestionnaire', component: GestionnaireDashboard, canActivate: [GestionnaireGuard]},
