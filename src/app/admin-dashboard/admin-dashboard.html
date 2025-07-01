@@ -52,17 +52,17 @@
 
     <!-- Actions Rapides Administration -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" style="display: flex; justify-content: center">
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="showUsersSection = !showUsersSection">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="navigateToListeUtilisateurs()">
         <mat-icon class="text-2xl text-blue-500">people</mat-icon>
         <span>Gestion Utilisateurs</span>
       </button>
 
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="showCapteursSection = !showCapteursSection">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="navigateToListeCapteurs()">
         <mat-icon class="text-2xl text-green-500">sensors</mat-icon>
         <span>Gestion Capteurs</span>
       </button>
 
-      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="showPermissionsSection = !showPermissionsSection">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="navigateToPermissions()">
         <mat-icon class="text-2xl text-purple-500">security</mat-icon>
         <span>Permissions & Accès</span>
       </button>
@@ -102,7 +102,7 @@
             </div>
           </mat-card-content>
           <mat-card-actions>
-            <button mat-button color="primary" (click)="showUsersSection = !showUsersSection">
+            <button mat-button color="primary" (click)="navigateToListeUtilisateurs()">
               {{ showUsersSection ? 'Masquer' : 'Gérer' }}
             </button>
           </mat-card-actions>
@@ -137,7 +137,7 @@
             </div>
           </mat-card-content>
           <mat-card-actions>
-            <button mat-button color="primary" (click)="showCapteursSection = !showCapteursSection">
+            <button mat-button color="primary" (click)="navigateToListeCapteurs()">
               {{ showCapteursSection ? 'Masquer' : 'Gérer' }}
             </button>
           </mat-card-actions>
@@ -169,7 +169,7 @@
             </div>
           </mat-card-content>
           <mat-card-actions>
-            <button mat-button color="primary" (click)="showPermissionsSection = !showPermissionsSection">
+            <button mat-button color="primary" (click)="navigateToPermissions()">
               {{ showPermissionsSection ? 'Masquer' : 'Configurer' }}
             </button>
           </mat-card-actions>

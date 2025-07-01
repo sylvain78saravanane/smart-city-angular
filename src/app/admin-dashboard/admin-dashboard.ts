@@ -436,7 +436,7 @@ export class AdminDashboard implements OnInit {
 
   logout() {
     this.authService.logoutAdmin();
-    this.router.navigate(['/login/administrateur']);
+    this.router.navigate(['/admin/login']);
   }
 
   // Méthodes pour les actions rapides
@@ -464,22 +464,33 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  managePermissions() {
-    console.log('Gestion des permissions demandée');
-    this.showPermissionsSection = !this.showPermissionsSection;
+  navigateToListeUtilisateurs() {
+    this.router.navigate(['/dashboard/administrateur/liste-utilisateurs']);
+  }
+
+  navigateToListeCapteurs() {
+    this.router.navigate(['/dashboard/administrateur/capteur']);
+  }
+
+  navigateToPermissions() {
+    this.router.navigate(['/dashboard/administrateur/permissions']);
   }
 
   // Méthodes de navigation pour les sections
   toggleUsersSection() {
-    this.showUsersSection = !this.showUsersSection;
+    this.navigateToListeUtilisateurs();
   }
 
   toggleCapteursSection() {
-    this.showCapteursSection = !this.showCapteursSection;
+    this.navigateToListeCapteurs();
   }
 
   togglePermissionsSection() {
-    this.showPermissionsSection = !this.showPermissionsSection;
+    this.navigateToPermissions();
+  }
+
+  managePermissions() {
+    this.navigateToPermissions();
   }
 
   // Méthodes pour les statistiques
