@@ -180,6 +180,55 @@ export class CitoyenGuard implements CanActivate {
 }
 
 /**
+ * ChercheurGuard
+ */
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ChercheurGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  canActivate(): Observable<boolean> | boolean {
+    return this.authService.currentUser$.pipe(
+      take(1),
+      map(user => {
+        if (user && user.role === 'CHERCHEUR') {
+          return true;
+        }
+
+        if (user) {
+          this.redirectBasedOnRole(user.role);
+        } else {
+          this.router.navigate(['/login/chercheur']);
+        }
+        return false;
+      })
+    );
+  }
+
+  private redirectBasedOnRole(role: string): void {
+    switch (role) {
+      case 'CITOYEN':
+        this.router.navigate(['/dashboard']);
+        break;
+      case 'ADMINISTRATEUR':
+        this.router.navigate(['/dashboard/administrateur']);
+        break;
+      case 'GESTIONNAIRE_VILLE':
+        this.router.navigate(['/dashboard/gestionnaire']);
+        break;
+      default:
+        this.router.navigate(['/login']);
+    }
+  }
+}
+
+/**
  * GestionnaireGuard
  */
 @Injectable({

@@ -15,6 +15,7 @@ import {PageCommentaires} from './page-commentaires/page-commentaires';
 import {PageConnexionGestionnaire} from './page-connexion-gestionnaire/page-connexion-gestionnaire';
 import {GestionnaireDashboard} from './gestionnaire-dashboard/gestionnaire-dashboard';
 import {AlertesPersonnaliseesComponent} from './alertes-personnalisees-component/alertes-personnalisees-component';
+import {ChercheurDashboard} from './chercheur-dashboard/chercheur-dashboard';
 
 export const routes: Routes = [
   {path:'login', component: PageConnexion},
@@ -35,6 +36,7 @@ export const routes: Routes = [
   {path: 'dashboard/gestionnaire', component: GestionnaireDashboard, canActivate: [GestionnaireGuard]},
 
   {path: 'login/chercheur', component : PageConnexionChercheur},
+  {path: 'dashboard/chercheur', component: ChercheurDashboard},
 
   {path: '**', component : ErrorPage}, // à mettre toujours à la fin
 ];

@@ -89,51 +89,23 @@ export class DonneeIoTService {
   }
 
   /**
-   * Obtenir toutes les données d'un capteur avec pagination
-   */
-  getDonneesByCapteur(idCapteur: number, page: number = 0, size: number = 20): Observable<any> {
-    return this.http.get<any>(`${this.API_URL}/capteurs/${idCapteur}/donnees?page=${page}&size=${size}`, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  /**
    * Obtenir les données par période
    */
   getDonneesByPeriode(idCapteur: number, dateDebut: string, dateFin: string): Observable<DonneeListResponse> {
+    // Encoder les paramètres URL pour éviter les problèmes de caractères spéciaux
+    const params = new URLSearchParams({
+      dateDebut: dateDebut,
+      dateFin: dateFin
+    });
+
     return this.http.get<DonneeListResponse>(
-      `${this.API_URL}/capteurs/${idCapteur}/donnees/periode?dateDebut=${dateDebut}&dateFin=${dateFin}`,
+      `${this.API_URL}/capteurs/${idCapteur}/donnees/periode?${params.toString()}`,
       { headers: this.getAuthHeaders() }
     ).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Obtenir les statistiques de température
-   */
-  getStatistiquesTemperature(idCapteur: number, dateDebut: string, dateFin: string): Observable<StatistiquesResponse> {
-    return this.http.get<StatistiquesResponse>(
-      `${this.API_URL}/capteurs/${idCapteur}/statistiques/temperature?dateDebut=${dateDebut}&dateFin=${dateFin}`,
-      { headers: this.getAuthHeaders() }
-    ).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  /**
-   * Obtenir les statistiques de qualité de l'air
-   */
-  getStatistiquesQualiteAir(idCapteur: number, dateDebut: string, dateFin: string): Observable<StatistiquesAirResponse> {
-    return this.http.get<StatistiquesAirResponse>(
-      `${this.API_URL}/capteurs/${idCapteur}/statistiques/air?dateDebut=${dateDebut}&dateFin=${dateFin}`,
-      { headers: this.getAuthHeaders() }
-    ).pipe(
-      catchError(this.handleError)
-    );
-  }
 
   /**
    * Déclencher une collecte manuelle
@@ -146,16 +118,6 @@ export class DonneeIoTService {
     );
   }
 
-  /**
-   * Obtenir les données récentes (dernières heures)
-   */
-  getDonneesRecentes(heures: number = 24): Observable<DonneeListResponse> {
-    return this.http.get<DonneeListResponse>(`${this.API_URL}/donnees/recentes?heures=${heures}`, {
-      headers: this.getAuthHeaders()
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
 
   /**
    * Obtenir le nombre de données d'un capteur
@@ -226,6 +188,7 @@ export class DonneeIoTService {
    * Formater la date pour les appels API
    */
   formatDateForAPI(date: Date): string {
+    const isoString = date.toISOString();
     return date.toISOString().slice(0, 19); // Format: 2025-06-28T10:30:00
   }
 

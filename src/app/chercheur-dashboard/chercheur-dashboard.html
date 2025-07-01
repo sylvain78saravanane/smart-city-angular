@@ -1,0 +1,523 @@
+<!-- src/app/chercheur-dashboard/chercheur-dashboard.html -->
+
+<app-header></app-header>
+
+<!-- Container principal du dashboard chercheur -->
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 p-4">
+  <div class="container mx-auto max-w-7xl">
+
+    <!-- En-tête de bienvenue chercheur -->
+    <div class="mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+              🔬 Bienvenue {{ currentUser?.prenom }} !
+            </h1>
+            <p class="text-gray-600">
+              Espace de recherche - Données IoT de Tech City pour vos analyses scientifiques
+            </p>
+            <div class="mt-2 text-sm text-purple-600">
+              🏛️ {{ currentUser?.donneesSpecifiques?.institut || 'Institut de recherche' }}
+            </div>
+            <div class="text-sm text-purple-600">
+              📚 Domaine: {{ currentUser?.donneesSpecifiques?.domaineRecherche || 'Non spécifié' }}
+            </div>
+
+            <!-- Indicateur de dernière mise à jour -->
+            <div class="mt-3 flex items-center space-x-4">
+              <div class="flex items-center space-x-2 text-sm">
+                <mat-icon [class]="isLoading ? 'animate-spin text-purple-500' : 'text-green-500'" class="text-sm">
+                  {{ isLoading ? 'refresh' : 'check_circle' }}
+                </mat-icon>
+                <span [class]="isLoading ? 'text-purple-600' : 'text-green-600'">
+                  {{ isLoading ? 'Mise à jour en cours...' : 'Dernière mise à jour: ' + getLastUpdateString() }}
+                </span>
+              </div>
+
+              <!-- Bouton de rafraîchissement manuel -->
+              <button
+                mat-icon-button
+                (click)="refreshData()"
+                [disabled]="isLoading"
+                class="text-purple-500"
+                title="Rafraîchir manuellement">
+                <mat-icon [class]="isLoading ? 'animate-spin' : ''">refresh</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="text-right">
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="logout()"
+              class="mb-2">
+              <mat-icon class="mr-2">logout</mat-icon>
+              Se déconnecter
+            </button>
+            <div class="text-xs text-gray-500">
+              Connecté en tant que {{ currentUser?.role }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message d'erreur si pas de données -->
+    @if (error && !isLoading) {
+      <div class="mb-8 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+        <div class="flex items-center">
+          <mat-icon class="text-red-400 mr-3">error</mat-icon>
+          <div>
+            <h3 class="font-medium text-red-800">Données indisponibles</h3>
+            <p class="text-red-700 text-sm mt-1">{{ error }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Onglets principaux -->
+    <mat-tab-group class="mb-8">
+
+      <!-- Onglet 1: Données en temps réel -->
+      <mat-tab label="📊 Données en Temps Réel">
+
+        <!-- Actions Rapides -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 mt-6">
+          <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+            <mat-icon class="text-2xl text-purple-500">science</mat-icon>
+            <span>Analyses Avancées</span>
+          </button>
+
+          <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+            <mat-icon class="text-2xl text-blue-500">analytics</mat-icon>
+            <span>Corrélations</span>
+          </button>
+
+          <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="refreshData()">
+            <mat-icon class="text-2xl text-orange-500">refresh</mat-icon>
+            <span>Actualiser</span>
+          </button>
+
+          <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure">
+            <mat-icon class="text-2xl text-green-500">assessment</mat-icon>
+            <span>Rapports</span>
+          </button>
+        </div>
+
+        <!-- Grille des données IoT en temps réel -->
+        <mat-grid-list cols="1" rowHeight="320px" gutterSize="16"
+                       [cols]="getGridCols()"
+                       class="mb-8">
+
+          <!-- Carte Qualité de l'Air -->
+          <mat-grid-tile>
+            <mat-card class="w-full h-full hover-azure">
+              <mat-card-header>
+                <mat-icon
+                  mat-card-avatar
+                  [style.background-color]="getQualiteAirColor()"
+                  class="text-white">
+                  air
+                </mat-icon>
+                <mat-card-title>Qualité de l'Air</mat-card-title>
+                <mat-card-subtitle>Analyse environnementale</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content class="flex-1 flex flex-col justify-center">
+                @if (isLoading) {
+                  <div class="text-center">
+                    <mat-icon class="animate-spin text-4xl text-purple-500 mb-4">refresh</mat-icon>
+                    <div class="text-gray-600">Chargement...</div>
+                  </div>
+                } @else if (donneeEnTempsReel) {
+                  <div class="text-center">
+                    <div class="text-4xl font-bold mb-2" [style.color]="getQualiteAirColor()">
+                      {{ donneeEnTempsReel.qualiteAirResume }}
+                    </div>
+                    <div class="text-sm text-gray-600 mb-4">
+                      PM10: {{ donneeEnTempsReel.pm10 | number:'1.1-1' }} μg/m³<br>
+                      CO: {{ donneeEnTempsReel.co | number:'1.1-1' }} mg/m³<br>
+                      NO2: {{ donneeEnTempsReel.no2 | number:'1.1-1' }} μg/m³
+                    </div>
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="getQualiteAirProgress()"
+                      [color]="getQualiteAirProgress() > 75 ? 'primary' : getQualiteAirProgress() > 50 ? 'accent' : 'warn'">
+                    </mat-progress-bar>
+                  </div>
+                } @else {
+                  <div class="text-center text-gray-500">
+                    <mat-icon class="text-4xl mb-2">cloud_off</mat-icon>
+                    <div>Aucune donnée</div>
+                  </div>
+                }
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button color="primary">Analyser</button>
+              </mat-card-actions>
+            </mat-card>
+          </mat-grid-tile>
+
+          <!-- Carte Température -->
+          <mat-grid-tile>
+            <mat-card class="w-full h-full hover-azure">
+              <mat-card-header>
+                <mat-icon
+                  mat-card-avatar
+                  [style.background-color]="getTemperatureColor()"
+                  class="text-white">
+                  thermostat
+                </mat-icon>
+                <mat-card-title>Température</mat-card-title>
+                <mat-card-subtitle>Données climatiques</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content class="flex-1 flex flex-col justify-center">
+                @if (isLoading) {
+                  <div class="text-center">
+                    <mat-icon class="animate-spin text-4xl text-purple-500 mb-4">refresh</mat-icon>
+                    <div class="text-gray-600">Chargement...</div>
+                  </div>
+                } @else if (donneeEnTempsReel) {
+                  <div class="text-center">
+                    <div class="text-4xl font-bold mb-2" [style.color]="getTemperatureColor()">
+                      {{ donneeEnTempsReel.temperatureCelsius | number:'1.1-1' }}°C
+                    </div>
+                    <div class="text-sm text-gray-600 mb-4">
+                      Fahrenheit: {{ donneeEnTempsReel.temperatureFahrenheit | number:'1.0-0' }}°F<br>
+                      Humidité: {{ donneeEnTempsReel.humidite | number:'1.0-0' }}%<br>
+                      Conditions: {{ donneeEnTempsReel.conditionsMeteo }}
+                    </div>
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="getTemperatureProgress()"
+                      color="accent">
+                    </mat-progress-bar>
+                  </div>
+                } @else {
+                  <div class="text-center text-gray-500">
+                    <mat-icon class="text-4xl mb-2">thermostat_off</mat-icon>
+                    <div>Aucune donnée</div>
+                  </div>
+                }
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button color="primary">Tendances</button>
+              </mat-card-actions>
+            </mat-card>
+          </mat-grid-tile>
+
+          <!-- Carte Humidité -->
+          <mat-grid-tile>
+            <mat-card class="w-full h-full hover-azure">
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="bg-blue-500 text-white">water_drop</mat-icon>
+                <mat-card-title>Humidité</mat-card-title>
+                <mat-card-subtitle>Analyse hygrométrique</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content class="flex-1 flex flex-col justify-center">
+                @if (isLoading) {
+                  <div class="text-center">
+                    <mat-icon class="animate-spin text-4xl text-purple-500 mb-4">refresh</mat-icon>
+                    <div class="text-gray-600">Chargement...</div>
+                  </div>
+                } @else if (donneeEnTempsReel) {
+                  <div class="text-center">
+                    <div class="text-4xl font-bold text-blue-600 mb-2">
+                      {{ donneeEnTempsReel.humidite | number:'1.0-0' }}%
+                    </div>
+                    <div class="text-sm text-gray-600 mb-4">
+                      Précipitations: {{ donneeEnTempsReel.precipitationMm | number:'1.1-1' }} mm<br>
+                      Nuages: {{ donneeEnTempsReel.nuageux | number:'1.0-0' }}%<br>
+                      Vent: {{ donneeEnTempsReel.vitesseVentKph | number:'1.1-1' }} km/h
+                    </div>
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="getHumiditeProgress()"
+                      color="primary">
+                    </mat-progress-bar>
+                  </div>
+                } @else {
+                  <div class="text-center text-gray-500">
+                    <mat-icon class="text-4xl mb-2">water_drop_off</mat-icon>
+                    <div>Aucune donnée</div>
+                  </div>
+                }
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button color="primary">Modéliser</button>
+              </mat-card-actions>
+            </mat-card>
+          </mat-grid-tile>
+
+          <!-- Carte Indice UV -->
+          <mat-grid-tile>
+            <mat-card class="w-full h-full hover-azure">
+              <mat-card-header>
+                <mat-icon
+                  mat-card-avatar
+                  [style.background-color]="getUVColor()"
+                  class="text-white">
+                  wb_sunny
+                </mat-icon>
+                <mat-card-title>Indice UV</mat-card-title>
+                <mat-card-subtitle>Rayonnement solaire</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content class="flex-1 flex flex-col justify-center">
+                @if (isLoading) {
+                  <div class="text-center">
+                    <mat-icon class="animate-spin text-4xl text-purple-500 mb-4">refresh</mat-icon>
+                    <div class="text-gray-600">Chargement...</div>
+                  </div>
+                } @else if (donneeEnTempsReel) {
+                  <div class="text-center">
+                    <div class="text-4xl font-bold mb-2" [style.color]="getUVColor()">
+                      {{ donneeEnTempsReel.indiceUv | number:'1.0-0' }}
+                    </div>
+                    <div class="text-sm text-gray-600 mb-4">
+                      Niveau: {{ getUVLevel() }}<br>
+                      O3: {{ donneeEnTempsReel.o3 | number:'1.1-1' }} μg/m³<br>
+                      SO2: {{ donneeEnTempsReel.so2 | number:'1.1-1' }} μg/m³
+                    </div>
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="getUVProgress()"
+                      [color]="getUVProgress() < 50 ? 'primary' : 'warn'">
+                    </mat-progress-bar>
+                  </div>
+                } @else {
+                  <div class="text-center text-gray-500">
+                    <mat-icon class="text-4xl mb-2">wb_sunny_off</mat-icon>
+                    <div>Aucune donnée</div>
+                  </div>
+                }
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button color="primary">Corréler</button>
+              </mat-card-actions>
+            </mat-card>
+          </mat-grid-tile>
+
+        </mat-grid-list>
+
+        <!-- Section Données Détaillées -->
+        @if (donneeEnTempsReel && !isLoading) {
+          <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+              <mat-icon class="mr-2 text-purple-500">analytics</mat-icon>
+              Analyse Détaillée - Capteur {{ donneeEnTempsReel.idCapteur }}
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <!-- Localisation -->
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <div class="flex items-center mb-2">
+                  <mat-icon class="text-purple-600 mr-2">place</mat-icon>
+                  <h3 class="font-semibold text-gray-800">Localisation</h3>
+                </div>
+                <p class="text-sm text-gray-600">{{ donneeEnTempsReel.localisation }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ donneeEnTempsReel.coordonnees }}</p>
+                <p class="text-xs text-gray-500 mt-1">Heure locale: {{ formatDate(donneeEnTempsReel.heureLocale) }}</p>
+              </div>
+
+              <!-- Données Atmosphériques -->
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="flex items-center mb-2">
+                  <mat-icon class="text-blue-600 mr-2">air</mat-icon>
+                  <h3 class="font-semibold text-gray-800">Atmosphère</h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                  Pression atm.: Calculable<br>
+                  Visibilité: {{ 100 - donneeEnTempsReel.nuageux | number:'1.0-0' }}%<br>
+                  Indice qualité: {{ donneeEnTempsReel.qualiteAirResume }}
+                </p>
+              </div>
+
+              <!-- Polluants -->
+              <div class="bg-orange-50 p-4 rounded-lg">
+                <div class="flex items-center mb-2">
+                  <mat-icon class="text-orange-600 mr-2">warning</mat-icon>
+                  <h3 class="font-semibold text-gray-800">Polluants</h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                  CO: {{ donneeEnTempsReel.co | number:'1.2-2' }} mg/m³<br>
+                  NO2: {{ donneeEnTempsReel.no2 | number:'1.1-1' }} μg/m³<br>
+                  PM10: {{ donneeEnTempsReel.pm10 | number:'1.1-1' }} μg/m³
+                </p>
+              </div>
+
+              <!-- Métadonnées -->
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="flex items-center mb-2">
+                  <mat-icon class="text-green-600 mr-2">info</mat-icon>
+                  <h3 class="font-semibold text-gray-800">Métadonnées</h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                  Source: {{ donneeEnTempsReel.sourceApi }}<br>
+                  Statut: {{ donneeEnTempsReel.statutDonnee }}<br>
+                  Validité: {{ donneeEnTempsReel.donneeValide ? 'Valide' : 'Invalide' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+
+      </mat-tab>
+
+      <!-- Onglet 2: Export et Analyse -->
+      <mat-tab label="📥 Export & Analyse">
+
+        <div class="mt-6">
+          <!-- Section Export de Données -->
+          <mat-card class="mb-8">
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="bg-purple-500 text-white">download</mat-icon>
+              <mat-card-title>Exportation de Données</mat-card-title>
+              <mat-card-subtitle>Téléchargez les données IoT pour vos analyses</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form [formGroup]="exportForm" class="space-y-6">
+
+                <!-- Sélection de période -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Date de début</mat-label>
+                    <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebut" readonly>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerDebut"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerDebut></mat-datepicker>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Date de fin</mat-label>
+                    <input matInput [matDatepicker]="pickerFin" formControlName="dateFin" readonly>
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerFin></mat-datepicker>
+                  </mat-form-field>
+                </div>
+
+                <!-- Format et options -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Format d'export</mat-label>
+                    <mat-select formControlName="format">
+                      @for (format of availableFormats; track format.value) {
+                        <mat-option [value]="format.value">
+                          {{ format.label }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-hint>Choisissez le format selon votre outil d'analyse</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>ID Capteur</mat-label>
+                    <input matInput type="number" formControlName="capteurId" readonly>
+                    <mat-hint>Capteur principal de Tech City</mat-hint>
+                  </mat-form-field>
+                </div>
+
+              </form>
+            </mat-card-content>
+
+            <mat-card-actions class="flex justify-between">
+              <button
+                mat-button
+                color="primary"
+                (click)="updateHistoricalData()"
+                [disabled]="isLoading">
+                <mat-icon class="mr-2">preview</mat-icon>
+                Prévisualiser
+              </button>
+
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="exportData()"
+                [disabled]="isExporting || exportForm.invalid"
+                class="btn-azure">
+                @if (isExporting) {
+                  <mat-icon class="animate-spin mr-2">refresh</mat-icon>
+                  <span>Export en cours...</span>
+                } @else {
+                  <mat-icon class="mr-2">download</mat-icon>
+                  <span>Exporter les données</span>
+                }
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+          <!-- Prévisualisation des données -->
+          @if (donneesHistoriques.length > 0) {
+            <mat-card>
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="bg-blue-500 text-white">table_view</mat-icon>
+                <mat-card-title>Prévisualisation des Données</mat-card-title>
+                <mat-card-subtitle>{{ donneesHistoriques.length }} enregistrements trouvés</mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="overflow-x-auto">
+                  <table mat-table [dataSource]="donneesHistoriques.slice(0, 10)" class="w-full">
+
+                    <ng-container matColumnDef="timestampCollecte">
+                      <th mat-header-cell *matHeaderCellDef>Date/Heure</th>
+                      <td mat-cell *matCellDef="let donnee">{{ formatDate(donnee.timestampCollecte) }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="villeNom">
+                      <th mat-header-cell *matHeaderCellDef>Ville</th>
+                      <td mat-cell *matCellDef="let donnee">{{ donnee.villeNom }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="temperatureCelsius">
+                      <th mat-header-cell *matHeaderCellDef>Temp. (°C)</th>
+                      <td mat-cell *matCellDef="let donnee">{{ donnee.temperatureCelsius | number:'1.1-1' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="humidite">
+                      <th mat-header-cell *matHeaderCellDef>Humidité (%)</th>
+                      <td mat-cell *matCellDef="let donnee">{{ donnee.humidite | number:'1.0-0' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="pm10">
+                      <th mat-header-cell *matHeaderCellDef>PM10 (μg/m³)</th>
+                      <td mat-cell *matCellDef="let donnee">{{ donnee.pm10 | number:'1.1-1' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="indiceUv">
+                      <th mat-header-cell *matHeaderCellDef>UV</th>
+                      <td mat-cell *matCellDef="let donnee">{{ donnee.indiceUv | number:'1.0-0' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="qualiteAirResume">
+                      <th mat-header-cell *matHeaderCellDef>Qualité Air</th>
+                      <td mat-cell *matCellDef="let donnee">
+                        <mat-chip [style.background-color]="getQualiteAirColor()">
+                          {{ donnee.qualiteAirResume }}
+                        </mat-chip>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                  </table>
+                </div>
+
+                @if (donneesHistoriques.length > 10) {
+                  <div class="text-center mt-4 text-sm text-gray-600">
+                    Affichage des 10 premiers résultats sur {{ donneesHistoriques.length }} au total
+                  </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          }
+
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+
+  </div>
+</div>
+
+<app-footer></app-footer>
