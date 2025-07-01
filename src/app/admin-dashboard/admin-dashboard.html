@@ -1,36 +1,35 @@
-<!-- src/app/admin-dashboard/admin-dashboard.html -->
+<!-- src/app/admin-dashboard/admin-dashboard.html - Version complète -->
 
 <app-header></app-header>
 
 <!-- Container principal du dashboard admin -->
 <div class="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 p-4">
-  <div class="container mx-auto max-w-7xl">
+  <div class="container mx-auto max-w-6xl">
 
-    <!-- En-tête administrateur -->
+    <!-- En-tête de bienvenue admin -->
     <div class="mb-8">
       <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
         <div class="flex items-center justify-between">
           <div>
-            <div class="flex items-center space-x-3 mb-2">
-              <div class="bg-red-500 p-3 rounded-full shadow-lg">
-                <mat-icon class="text-white text-2xl">admin_panel_settings</mat-icon>
-              </div>
-              <div>
-                <h1 class="text-3xl font-bold text-gray-800">
-                  Panneau d'Administration
-                </h1>
-                <p class="text-gray-600">
-                  Bienvenue {{ currentAdmin()?.prenom }} {{ currentAdmin()?.nom }}
-                </p>
-              </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+              🔧 Bienvenue Administrateur {{ currentAdmin()?.prenom }} !
+            </h1>
+            <p class="text-gray-600">
+              Panneau d'administration Smart City IoT - Contrôle total du système
+            </p>
+            <div class="mt-2 text-sm text-red-600">
+              🔐 Code Admin: {{ currentAdmin()?.donneesSpecifiques?.codeAdmin }}
             </div>
-            <div class="flex items-center space-x-4 text-sm">
-              <div class="flex items-center text-red-600 font-medium">
-                🔐 Code Admin: {{ currentAdmin()?.donneesSpecifiques?.codeAdmin }}
+
+            <!-- Indicateur de statut système -->
+            <div class="mt-3 flex items-center space-x-4">
+              <div class="flex items-center space-x-2 text-sm">
+                <mat-icon class="text-green-500 text-sm">check_circle</mat-icon>
+                <span class="text-green-600">Système opérationnel</span>
               </div>
-              <div class="flex items-center text-green-600">
-                <mat-icon class="text-sm mr-1">check_circle</mat-icon>
-                Accès sécurisé actif
+              <div class="flex items-center space-x-2 text-sm">
+                <mat-icon class="text-blue-500 text-sm">security</mat-icon>
+                <span class="text-blue-600">Accès sécurisé actif</span>
               </div>
             </div>
           </div>
@@ -51,426 +50,706 @@
       </div>
     </div>
 
-    <!-- Onglets principaux -->
-    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="admin-tabs mb-8">
+    <!-- Actions Rapides Administration -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" style="display: flex; justify-content: center">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="showUsersSection = !showUsersSection">
+        <mat-icon class="text-2xl text-blue-500">people</mat-icon>
+        <span>Gestion Utilisateurs</span>
+      </button>
 
-      <!-- Onglet Vue d'ensemble -->
-      <mat-tab label="Vue d'ensemble">
-        <div class="pt-6">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="showCapteursSection = !showCapteursSection">
+        <mat-icon class="text-2xl text-green-500">sensors</mat-icon>
+        <span>Gestion Capteurs</span>
+      </button>
 
-          <!-- Grille des statistiques principales -->
-          <mat-grid-list cols="1" rowHeight="140px" gutterSize="16"
-                         [cols]="getGridCols()"
-                         class="mb-8">
+      <button mat-stroked-button class="p-4 h-20 flex items-center justify-center space-x-3 hover-azure" (click)="showPermissionsSection = !showPermissionsSection">
+        <mat-icon class="text-2xl text-purple-500">security</mat-icon>
+        <span>Permissions & Accès</span>
+      </button>
+    </div>
 
-            <!-- Stats Utilisateurs -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToUsers()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-blue-500 text-white">people</mat-icon>
-                  <mat-card-title>Utilisateurs</mat-card-title>
-                  <mat-card-subtitle>{{ stats().utilisateurs.total }} au total</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="grid grid-cols-2 gap-2 text-center">
-                    <div>
-                      <div class="text-lg font-bold text-blue-600">{{ stats().utilisateurs.citoyens }}</div>
-                      <div class="text-xs text-gray-600">Citoyens</div>
-                    </div>
-                    <div>
-                      <div class="text-lg font-bold text-green-600">{{ stats().utilisateurs.actifs }}</div>
-                      <div class="text-xs text-gray-600">Actifs</div>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
+    <!-- Grille des statistiques principales -->
+    <mat-grid-list cols="1" rowHeight="320px" gutterSize="16"
+                   [cols]="getGridCols()"
+                   class="mb-8">
 
-            <!-- Stats Capteurs -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToSensors()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-green-500 text-white">sensors</mat-icon>
-                  <mat-card-title>Capteurs IoT</mat-card-title>
-                  <mat-card-subtitle>{{ stats().capteurs.total }} déployés</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="grid grid-cols-3 gap-1 text-center">
-                    <div>
-                      <div class="text-lg font-bold text-green-600">{{ stats().capteurs.actifs }}</div>
-                      <div class="text-xs text-gray-600">Actifs</div>
-                    </div>
-                    <div>
-                      <div class="text-lg font-bold text-orange-600">{{ stats().capteurs.maintenance }}</div>
-                      <div class="text-xs text-gray-600">Maintenance</div>
-                    </div>
-                    <div>
-                      <div class="text-lg font-bold text-red-600">{{ stats().capteurs.defaillants }}</div>
-                      <div class="text-xs text-gray-600">Défaillants</div>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Stats Alertes -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToAlerts()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-orange-500 text-white"
-                            [matBadge]="stats().alertes.critiques"
-                            matBadgeColor="warn"
-                            [matBadgeHidden]="stats().alertes.critiques === 0">warning</mat-icon>
-                  <mat-card-title>Alertes</mat-card-title>
-                  <mat-card-subtitle>{{ stats().alertes.actives }} actives</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="grid grid-cols-3 gap-1 text-center">
-                    <div>
-                      <div class="text-lg font-bold text-red-600">{{ stats().alertes.critiques }}</div>
-                      <div class="text-xs text-gray-600">Critiques</div>
-                    </div>
-                    <div>
-                      <div class="text-lg font-bold text-orange-600">{{ stats().alertes.moyennes }}</div>
-                      <div class="text-xs text-gray-600">Moyennes</div>
-                    </div>
-                    <div>
-                      <div class="text-lg font-bold text-blue-600">{{ stats().alertes.faibles }}</div>
-                      <div class="text-xs text-gray-600">Faibles</div>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Stats Données -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToData()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-purple-500 text-white">analytics</mat-icon>
-                  <mat-card-title>Données IoT</mat-card-title>
-                  <mat-card-subtitle>{{ stats().donnees.totalPoints | number }} points</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center">
-                    <div class="text-lg font-bold text-purple-600 mb-1">{{ stats().donnees.derniere24h | number }}</div>
-                    <div class="text-xs text-gray-600 mb-2">Dernières 24h</div>
-                    <mat-progress-bar mode="determinate" [value]="stats().donnees.qualiteMoyenne"
-                                      color="primary" class="h-2"></mat-progress-bar>
-                    <div class="text-xs text-gray-600 mt-1">Qualité: {{ stats().donnees.qualiteMoyenne }}%</div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-          </mat-grid-list>
-
-          <!-- Section activités récentes et alertes système -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            <!-- Activités récentes -->
-            <mat-card class="col-span-1">
-              <mat-card-header>
-                <mat-icon mat-card-avatar class="bg-indigo-500 text-white">history</mat-icon>
-                <mat-card-title>Activités Récentes</mat-card-title>
-                <mat-card-subtitle>{{ recentActivities().length }} événements</mat-card-subtitle>
-              </mat-card-header>
-              <mat-card-content>
-                <div class="space-y-3 max-h-80 overflow-y-auto">
-                  @for (activity of recentActivities(); track activity.id) {
-                    <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                      <mat-icon class="{{ getActivityColor(activity.severity) }} mt-1">
-                        {{ getActivityIcon(activity.type) }}
-                      </mat-icon>
-                      <div class="flex-1 min-w-0">
-                        <div class="font-medium text-gray-900">{{ activity.action }}</div>
-                        <div class="text-sm text-gray-600">{{ activity.description }}</div>
-                        <div class="text-xs text-gray-500 mt-1">
-                          {{ formatTimestamp(activity.timestamp) }}
-                          @if (activity.user) {
-                            • {{ activity.user }}
-                          }
-                        </div>
-                      </div>
-                      <mat-chip class="text-xs" [color]="activity.severity === 'critical' ? 'warn' : 'primary'">
-                        {{ activity.severity }}
-                      </mat-chip>
-                    </div>
-                  }
-                </div>
-              </mat-card-content>
-            </mat-card>
-
-            <!-- Alertes système -->
-
-
-          </div>
-        </div>
-      </mat-tab>
-
-      <!-- Onglet Gestion -->
-      <mat-tab label="Gestion">
-        <div class="pt-6">
-          <!-- Grille des modules de gestion -->
-          <mat-grid-list cols="1" rowHeight="200px" gutterSize="16"
-                         [cols]="getGridCols() > 4 ? 3 : getGridCols() === 4 ? 2 : 1"
-                         class="mb-8">
-
-            <!-- Gestion Utilisateurs -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToUsers()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-blue-500 text-white">people</mat-icon>
-                  <mat-card-title>Gestion Utilisateurs</mat-card-title>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center space-y-2">
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                      <div class="bg-blue-100 p-2 rounded">
-                        <div class="font-bold text-blue-700">{{ stats().utilisateurs.citoyens }}</div>
-                        <div class="text-xs">Citoyens</div>
-                      </div>
-                      <div class="bg-green-100 p-2 rounded">
-                        <div class="font-bold text-green-700">{{ stats().utilisateurs.gestionnaires }}</div>
-                        <div class="text-xs">Gestionnaires</div>
-                      </div>
-                    </div>
-                    <div class="text-xs text-gray-600">
-                      {{ stats().utilisateurs.actifs }} utilisateurs actifs
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Gestion Capteurs -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToSensors()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-green-500 text-white">sensors</mat-icon>
-                  <mat-card-title>Gestion Capteurs</mat-card-title>
-                  <mat-card-subtitle>Réseau IoT</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center space-y-2">
-                    <div class="flex justify-center space-x-2">
-                      <mat-chip color="primary" class="text-xs">
-                        {{ stats().capteurs.actifs }} Actifs
-                      </mat-chip>
-                      <mat-chip color="warn" class="text-xs"
-                                [class.hidden]="stats().capteurs.defaillants === 0">
-                        {{ stats().capteurs.defaillants }} Défaillants
-                      </mat-chip>
-                    </div>
-                    <mat-progress-bar
-                      mode="determinate"
-                      [value]="(stats().capteurs.actifs / stats().capteurs.total) * 100"
-                      color="primary">
-                    </mat-progress-bar>
-                    <div class="text-xs text-gray-600">
-                      {{ ((stats().capteurs.actifs / stats().capteurs.total) * 100).toFixed(1) }}% opérationnels
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Gestion Alertes -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToAlerts()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-orange-500 text-white">warning</mat-icon>
-                  <mat-card-title>Gestion Alertes</mat-card-title>
-                  <mat-card-subtitle>Surveillance système</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center space-y-2">
-                    <div class="grid grid-cols-3 gap-1 text-xs">
-                      <div class="bg-red-100 p-1 rounded">
-                        <div class="font-bold text-red-700">{{ stats().alertes.critiques }}</div>
-                        <div>Critiques</div>
-                      </div>
-                      <div class="bg-orange-100 p-1 rounded">
-                        <div class="font-bold text-orange-700">{{ stats().alertes.moyennes }}</div>
-                        <div>Moyennes</div>
-                      </div>
-                      <div class="bg-blue-100 p-1 rounded">
-                        <div class="font-bold text-blue-700">{{ stats().alertes.faibles }}</div>
-                        <div>Faibles</div>
-                      </div>
-                    </div>
-                    <div class="text-xs text-gray-600">
-                      {{ stats().alertes.actives }} alertes actives
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Configuration Système -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToSettings()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-gray-500 text-white">settings</mat-icon>
-                  <mat-card-title>Configuration</mat-card-title>
-                  <mat-card-subtitle>Paramètres système</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center space-y-3">
-                    <div class="flex justify-center space-x-2">
-                      <mat-icon class="text-green-500">check_circle</mat-icon>
-                      <span class="text-sm">Système opérationnel</span>
-                    </div>
-                    <div class="text-xs text-gray-600">
-                      Dernière mise à jour: Aujourd'hui
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Rapports et Analytics -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="navigateToReports()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-indigo-500 text-white">assessment</mat-icon>
-                  <mat-card-title>Rapports</mat-card-title>
-                  <mat-card-subtitle>Analytics et export</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center space-y-2">
-                    <div class="text-2xl font-bold text-indigo-600">12</div>
-                    <div class="text-xs text-gray-600">Rapports générés ce mois</div>
-                    <button mat-stroked-button color="primary" class="text-xs">
-                      Nouveau rapport
-                    </button>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-
-            <!-- Sauvegarde et Maintenance -->
-            <mat-grid-tile>
-              <mat-card class="w-full h-full hover-admin cursor-pointer" (click)="backupSystem()">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar class="bg-purple-500 text-white">backup</mat-icon>
-                  <mat-card-title>Sauvegarde</mat-card-title>
-                  <mat-card-subtitle>Maintenance système</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="flex-1 flex flex-col justify-center">
-                  <div class="text-center space-y-2">
-                    <div class="text-sm text-green-600 font-medium">
-                      <mat-icon class="text-sm mr-1">check</mat-icon>
-                      Dernière sauvegarde OK
-                    </div>
-                    <div class="text-xs text-gray-600">Hier 02:00</div>
-                    <button mat-button color="primary" class="text-xs">
-                      Sauvegarder maintenant
-                    </button>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </mat-grid-tile>
-          </mat-grid-list>
-        </div>
-      </mat-tab>
-
-      <!-- Onglet Surveillance -->
-      <mat-tab label="Surveillance">
-        <div class="pt-6">
-          <!-- Monitoring en temps réel -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-
-
-            <!-- Performance système -->
-            <mat-card>
-              <mat-card-header>
-                <mat-icon mat-card-avatar class="bg-blue-500 text-white">speed</mat-icon>
-                <mat-card-title>Performance</mat-card-title>
-              </mat-card-header>
-              <mat-card-content>
-                <div class="space-y-4">
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>CPU</span>
-                      <span>45%</span>
-                    </div>
-                    <mat-progress-bar mode="determinate" value="45" color="primary"></mat-progress-bar>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>Mémoire</span>
-                      <span>62%</span>
-                    </div>
-                    <mat-progress-bar mode="determinate" value="62" color="primary"></mat-progress-bar>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>Stockage</span>
-                      <span>85%</span>
-                    </div>
-                    <mat-progress-bar mode="determinate" value="85" color="warn"></mat-progress-bar>
-                  </div>
-                </div>
-              </mat-card-content>
-            </mat-card>
-
-            <!-- Capteurs les plus actifs -->
-            <mat-card>
-              <mat-card-header>
-                <mat-icon mat-card-avatar class="bg-purple-500 text-white">trending_up</mat-icon>
-                <mat-card-title>Top Capteurs</mat-card-title>
-              </mat-card-header>
-              <mat-card-content>
-                <div class="space-y-2">
-                  @for (capteur of stats().donnees.capteursPlusActifs; track capteur.nom) {
-                    <div class="flex items-center justify-between text-sm">
-                      <span class="truncate">{{ capteur.nom }}</span>
-                      <mat-chip class="text-xs">{{ capteur.points }}</mat-chip>
-                    </div>
-                  }
-                </div>
-              </mat-card-content>
-            </mat-card>
-          </div>
-
-          <!-- Actions rapides administrateur -->
-          <mat-card>
-            <mat-card-header>
-              <mat-icon mat-card-avatar class="bg-red-500 text-white">flash_on</mat-icon>
-              <mat-card-title>Actions Rapides</mat-card-title>
-              <mat-card-subtitle>Outils d'administration</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button mat-stroked-button class="p-4 h-20 flex flex-col items-center justify-center space-y-2 hover-admin"
-                        (click)="exportData()">
-                  <mat-icon class="text-blue-500">download</mat-icon>
-                  <span class="text-sm">Export Données</span>
-                </button>
-
-                <button mat-stroked-button class="p-4 h-20 flex flex-col items-center justify-center space-y-2 hover-admin"
-                        (click)="backupSystem()">
-                  <mat-icon class="text-green-500">backup</mat-icon>
-                  <span class="text-sm">Sauvegarde</span>
-                </button>
-
-                <button mat-stroked-button class="p-4 h-20 flex flex-col items-center justify-center space-y-2 hover-admin"
-                        (click)="viewLogs()">
-                  <mat-icon class="text-orange-500">description</mat-icon>
-                  <span class="text-sm">Consulter Logs</span>
-                </button>
-
-                <button mat-stroked-button class="p-4 h-20 flex flex-col items-center justify-center space-y-2 hover-admin"
-                        (click)="managePermissions()">
-                  <mat-icon class="text-purple-500">security</mat-icon>
-                  <span class="text-sm">Permissions</span>
-                </button>
+      <!-- Carte Utilisateurs -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-blue-500 text-white">people</mat-icon>
+            <mat-card-title>Utilisateurs</mat-card-title>
+            <mat-card-subtitle>Gestion des comptes</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-blue-600 mb-2">
+                {{ stats().utilisateurs.total }}
               </div>
-            </mat-card-content>
-          </mat-card>
+              <div class="text-sm text-gray-600 mb-4">
+                {{ stats().utilisateurs.actifs }} actifs / {{ stats().utilisateurs.inactifs }} inactifs
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-green-100 p-2 rounded">
+                  <div class="font-bold text-green-700">{{ stats().utilisateurs.citoyens }}</div>
+                  <div>Citoyens</div>
+                </div>
+                <div class="bg-orange-100 p-2 rounded">
+                  <div class="font-bold text-orange-700">{{ stats().utilisateurs.gestionnaires }}</div>
+                  <div>Gestionnaires</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="showUsersSection = !showUsersSection">
+              {{ showUsersSection ? 'Masquer' : 'Gérer' }}
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Carte Capteurs -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-green-500 text-white">sensors</mat-icon>
+            <mat-card-title>Capteurs IoT</mat-card-title>
+            <mat-card-subtitle>Réseau de capteurs</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-green-600 mb-2">
+                {{ stats().capteurs.total }}
+              </div>
+              <div class="text-sm text-gray-600 mb-4">
+                {{ stats().capteurs.actifs }} actifs / {{ stats().capteurs.defaillants }} défaillants
+              </div>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="(stats().capteurs.actifs / stats().capteurs.total) * 100"
+                color="primary"
+                class="mb-2">
+              </mat-progress-bar>
+              <div class="text-xs text-gray-600">
+                {{ ((stats().capteurs.actifs / stats().capteurs.total) * 100).toFixed(1) }}% opérationnels
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="showCapteursSection = !showCapteursSection">
+              {{ showCapteursSection ? 'Masquer' : 'Gérer' }}
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Carte Permissions -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-purple-500 text-white">security</mat-icon>
+            <mat-card-title>Permissions</mat-card-title>
+            <mat-card-subtitle>Contrôle d'accès</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-purple-600 mb-2">8</div>
+              <div class="text-sm text-gray-600 mb-4">Modules sécurisés</div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-red-100 p-2 rounded">
+                  <div class="font-bold text-red-700">ADMIN</div>
+                  <div>Accès total</div>
+                </div>
+                <div class="bg-blue-100 p-2 rounded">
+                  <div class="font-bold text-blue-700">CITOYEN</div>
+                  <div>Lecture seule</div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="showPermissionsSection = !showPermissionsSection">
+              {{ showPermissionsSection ? 'Masquer' : 'Configurer' }}
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+      <!-- Carte Système -->
+      <mat-grid-tile>
+        <mat-card class="w-full h-full hover-azure">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="bg-indigo-500 text-white">settings</mat-icon>
+            <mat-card-title>Système</mat-card-title>
+            <mat-card-subtitle>État général</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="flex-1 flex flex-col justify-center">
+            <div class="text-center">
+              <div class="text-4xl font-bold text-indigo-600 mb-2">✓</div>
+              <div class="text-sm text-gray-600 mb-4">Opérationnel</div>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span>CPU</span><span>45%</span>
+                </div>
+                <mat-progress-bar mode="determinate" value="45" color="primary" class="h-1"></mat-progress-bar>
+                <div class="flex justify-between text-xs">
+                  <span>Mémoire</span><span>62%</span>
+                </div>
+                <mat-progress-bar mode="determinate" value="62" color="primary" class="h-1"></mat-progress-bar>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary">Détails</button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+
+    </mat-grid-list>
+
+    <!-- Section Gestion des Utilisateurs -->
+    @if (showUsersSection) {
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-800 flex items-center">
+            <mat-icon class="mr-2 text-blue-500">people</mat-icon>
+            Gestion des Utilisateurs
+            <span class="ml-3 bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+              {{ utilisateurs().length }} utilisateurs
+            </span>
+          </h2>
+          <button mat-raised-button color="primary">
+            <mat-icon class="mr-2">person_add</mat-icon>
+            Créer un utilisateur
+          </button>
         </div>
-      </mat-tab>
-    </mat-tab-group>
+
+        <!-- Statistiques utilisateurs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+            <div class="flex items-center">
+              <mat-icon class="text-green-600 mr-3 text-2xl">check_circle</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-green-800">{{ stats().utilisateurs.actifs }}</div>
+                <div class="text-sm text-green-700">Utilisateurs actifs</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+            <div class="flex items-center">
+              <mat-icon class="text-orange-600 mr-3 text-2xl">business</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-orange-800">{{ stats().utilisateurs.gestionnaires }}</div>
+                <div class="text-sm text-orange-700">Gestionnaires</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+            <div class="flex items-center">
+              <mat-icon class="text-blue-600 mr-3 text-2xl">science</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-blue-800">{{ stats().utilisateurs.chercheurs }}</div>
+                <div class="text-sm text-blue-700">Chercheurs</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg border-l-4 border-gray-500">
+            <div class="flex items-center">
+              <mat-icon class="text-gray-600 mr-3 text-2xl">cancel</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-gray-800">{{ stats().utilisateurs.inactifs }}</div>
+                <div class="text-sm text-gray-700">Inactifs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau des utilisateurs -->
+        <div class="overflow-x-auto">
+          <table mat-table [dataSource]="utilisateursDataSource" class="w-full">
+            <ng-container matColumnDef="nom">
+              <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
+              <td mat-cell *matCellDef="let user">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="text-white font-medium text-sm">
+                      {{ user.prenom.charAt(0) }}{{ user.nom.charAt(0) }}
+                    </span>
+                  </div>
+                  <div>
+                    <div class="font-medium">{{ user.prenom }} {{ user.nom }}</div>
+                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef>Rôle</th>
+              <td mat-cell *matCellDef="let user">
+                <mat-chip [color]="getRoleColor(user.role)">{{ user.role }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actif">
+              <th mat-header-cell *matHeaderCellDef>Statut</th>
+              <td mat-cell *matCellDef="let user">
+                <mat-slide-toggle [checked]="user.actif" (change)="changerStatutUtilisateur(user)">
+                </mat-slide-toggle>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button (click)="modifierUtilisateur(user)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="supprimerUtilisateur(user)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['nom', 'role', 'actif', 'actions']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['nom', 'role', 'actif', 'actions'];"></tr>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- Section Gestion des Capteurs -->
+    @if (showCapteursSection) {
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-800 flex items-center">
+            <mat-icon class="mr-2 text-green-500">sensors</mat-icon>
+            Gestion des Capteurs
+            <span class="ml-3 bg-green-100 text-green-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+              {{ capteurs().length }} capteurs
+            </span>
+          </h2>
+          <button mat-raised-button color="primary" (click)="navigateToCreateCapteur()">
+            <mat-icon class="mr-2">add</mat-icon>
+            Ajouter un capteur
+          </button>
+        </div>
+
+        <!-- Statistiques capteurs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+            <div class="flex items-center">
+              <mat-icon class="text-green-600 mr-3 text-2xl">check_circle</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-green-800">{{ stats().capteurs.actifs }}</div>
+                <div class="text-sm text-green-700">Capteurs actifs</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+            <div class="flex items-center">
+              <mat-icon class="text-orange-600 mr-3 text-2xl">build</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-orange-800">{{ stats().capteurs.maintenance }}</div>
+                <div class="text-sm text-orange-700">En maintenance</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-red-50 to-red-100 p-4 rounded-lg border-l-4 border-red-500">
+            <div class="flex items-center">
+              <mat-icon class="text-red-600 mr-3 text-2xl">error</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-red-800">{{ stats().capteurs.defaillants }}</div>
+                <div class="text-sm text-red-700">Défaillants</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+            <div class="flex items-center">
+              <mat-icon class="text-blue-600 mr-3 text-2xl">sensors</mat-icon>
+              <div>
+                <div class="text-2xl font-bold text-blue-800">{{ stats().capteurs.total }}</div>
+                <div class="text-sm text-blue-700">Total</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau des capteurs -->
+        <div class="overflow-x-auto">
+          <table mat-table [dataSource]="capteursDataSource" class="w-full">
+            <ng-container matColumnDef="nom">
+              <th mat-header-cell *matHeaderCellDef>Capteur</th>
+              <td mat-cell *matCellDef="let capteur">
+                <div class="flex items-center space-x-3">
+                  <mat-icon class="text-green-500">sensors</mat-icon>
+                  <div>
+                    <div class="font-medium">{{ capteur.nomCapteur }}</div>
+                    <div class="text-sm text-gray-500">{{ capteur.typeCapteur }}</div>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="statut">
+              <th mat-header-cell *matHeaderCellDef>Statut</th>
+              <td mat-cell *matCellDef="let capteur">
+                <mat-chip [color]="getStatutColor(capteur.statut)">{{ capteur.statut }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="gestionnaire">
+              <th mat-header-cell *matHeaderCellDef>Gestionnaire</th>
+              <td mat-cell *matCellDef="let capteur">
+                <div class="text-sm">{{ capteur.nomGestionnaireResponsable }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let capteur">
+                <button mat-icon-button (click)="modifierCapteur(capteur)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="supprimerCapteur(capteur)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['nom', 'statut', 'gestionnaire', 'actions']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['nom', 'statut', 'gestionnaire', 'actions'];"></tr>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- Section Permissions & Accès (Statique) -->
+    @if (showPermissionsSection) {
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-800 flex items-center">
+            <mat-icon class="mr-2 text-purple-500">security</mat-icon>
+            Permissions & Accès par Rôle
+          </h2>
+        </div>
+
+        <!-- Permissions par rôle -->
+        <div class="space-y-6">
+
+          <!-- ADMINISTRATEUR -->
+          <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg border-l-4 border-red-500">
+            <h3 class="text-lg font-bold text-red-800 mb-4 flex items-center">
+              <mat-icon class="mr-2">admin_panel_settings</mat-icon>
+              ADMINISTRATEUR - Accès Total
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Gestion Utilisateurs</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Création</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Modification</mat-chip>
+                  <mat-chip color="warn" class="text-xs">Suppression</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Gestion Capteurs</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Création</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Modification</mat-chip>
+                  <mat-chip color="warn" class="text-xs">Suppression</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Configuration Système</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Accès complet</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Données IoT</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Accès toutes données</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GESTIONNAIRE_VILLE -->
+          <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-lg border-l-4 border-orange-500">
+            <h3 class="text-lg font-bold text-orange-800 mb-4 flex items-center">
+              <mat-icon class="mr-2">business</mat-icon>
+              GESTIONNAIRE DE VILLE - Accès Restreint
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Gestion Capteurs</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Création</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Modification</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Données IoT</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture zone géographique</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Alertes</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Gestion alertes locales</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Rapports</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Génération rapports</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHERCHEUR -->
+          <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border-l-4 border-blue-500">
+            <h3 class="text-lg font-bold text-blue-800 mb-4 flex items-center">
+              <mat-icon class="mr-2">science</mat-icon>
+              CHERCHEUR - Accès Recherche
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Données IoT</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture données anonymisées</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Rapports de Recherche</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Création</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Export</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CITOYEN -->
+          <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-lg border-l-4 border-green-500">
+            <h3 class="text-lg font-bold text-green-800 mb-4 flex items-center">
+              <mat-icon class="mr-2">person</mat-icon>
+              CITOYEN - Accès Public
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Données Publiques</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture seule</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Alertes Personnalisées</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Création alertes personnelles</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Commentaires</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Lecture</mat-chip>
+                  <mat-chip color="primary" class="text-xs">Création</mat-chip>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded shadow-sm">
+                <h4 class="font-medium text-gray-800 mb-2">Dashboard Personnel</h4>
+                <div class="flex space-x-2">
+                  <mat-chip color="primary" class="text-xs">Consultation données locales</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Matrice des permissions résumée -->
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Matrice des Permissions</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse bg-white rounded-lg shadow">
+              <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left p-4 font-medium border-b">Module</th>
+                <th class="text-center p-4 font-medium border-b text-red-600">ADMIN</th>
+                <th class="text-center p-4 font-medium border-b text-orange-600">GESTIONNAIRE</th>
+                <th class="text-center p-4 font-medium border-b text-blue-600">CHERCHEUR</th>
+                <th class="text-center p-4 font-medium border-b text-green-600">CITOYEN</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="p-4 font-medium">Gestion Utilisateurs</td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">check_circle</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+              </tr>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="p-4 font-medium">Gestion Capteurs</td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">check_circle</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-orange-500">edit</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+              </tr>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="p-4 font-medium">Données IoT</td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">check_circle</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-blue-500">visibility</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-blue-500">visibility</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-blue-500">visibility</mat-icon>
+                </td>
+              </tr>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="p-4 font-medium">Configuration Système</td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">check_circle</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="p-4 font-medium">Rapports</td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">check_circle</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">add</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-green-500">add</mat-icon>
+                </td>
+                <td class="p-4 text-center">
+                  <mat-icon class="text-red-500">cancel</mat-icon>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Légende -->
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
+            <div class="flex items-center space-x-2">
+              <mat-icon class="text-green-500">check_circle</mat-icon>
+              <span>Accès complet</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <mat-icon class="text-orange-500">edit</mat-icon>
+              <span>Lecture + Modification</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <mat-icon class="text-blue-500">visibility</mat-icon>
+              <span>Lecture seule</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <mat-icon class="text-green-500">add</mat-icon>
+              <span>Création</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <mat-icon class="text-red-500">cancel</mat-icon>
+              <span>Aucun accès</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Section Alertes Administrateur -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        <mat-icon class="mr-2 text-yellow-500">notifications_active</mat-icon>
+        Alertes Système & Notifications
+      </h2>
+      <div class="space-y-3">
+
+        <!-- Alerte maintenance -->
+        <div class="flex items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+          <mat-icon class="text-orange-600 mr-3">build</mat-icon>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800">{{ stats().capteurs.maintenance }} capteur(s) en maintenance</div>
+            <div class="text-sm text-gray-600">
+              Maintenance programmée - Vérifiez les capteurs hors service
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerte capteurs défaillants -->
+        @if (stats().capteurs.defaillants > 0) {
+          <div class="flex items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+            <mat-icon class="text-red-600 mr-3">error</mat-icon>
+            <div class="flex-1">
+              <div class="font-medium text-gray-800">{{ stats().capteurs.defaillants }} capteur(s) défaillant(s)</div>
+              <div class="text-sm text-gray-600">
+                Intervention technique requise - Vérifiez la connectivité
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Alerte nouveaux utilisateurs -->
+        <div class="flex items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+          <mat-icon class="text-blue-600 mr-3">person_add</mat-icon>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800">{{ stats().utilisateurs.total - stats().utilisateurs.actifs }} nouveau(x) utilisateur(s) en attente</div>
+            <div class="text-sm text-gray-600">
+              Comptes en attente d'activation par l'administrateur
+            </div>
+          </div>
+        </div>
+
+        <!-- Info système -->
+        <div class="flex items-center p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+          <mat-icon class="text-green-600 mr-3">check_circle</mat-icon>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800">Système Smart City IoT opérationnel</div>
+            <div class="text-sm text-gray-600">
+              {{ stats().capteurs.actifs }} capteurs actifs - Collecte de données en cours
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

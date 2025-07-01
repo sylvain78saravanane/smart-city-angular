@@ -1,15 +1,7 @@
-/* src/app/admin-dashboard/admin-dashboard.css */
-
-/* ===================================================================
-   STYLES DASHBOARD ADMINISTRATEUR
-   =================================================================== */
-
-/* Container principal */
 .min-h-screen {
   min-height: 100vh;
 }
 
-/* Styles des onglets administrateur */
 .admin-tabs .mat-mdc-tab-header {
   background: linear-gradient(135deg, #fee2e2, #fef2f2);
   border-radius: 0.75rem 0.75rem 0 0;
@@ -31,7 +23,6 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Cartes avec effet hover administrateur */
 .hover-admin {
   transition: all 0.3s ease-in-out;
   border-radius: 12px !important;
@@ -218,27 +209,8 @@ mat-card-content {
   .hover-admin:hover {
     transform: translateY(-2px);
   }
-
-  .grid.grid-cols-2.md\\:grid-cols-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
-@media (max-width: 640px) {
-  .grid.grid-cols-1.lg\\:grid-cols-2 {
-    grid-template-columns: 1fr;
-  }
-
-  .grid.grid-cols-1.lg\\:grid-cols-3 {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-tabs .mat-mdc-tab-label {
-    min-width: 60px;
-    font-size: 0.75rem;
-    padding: 8px 4px;
-  }
-}
 
 /* Styles pour les boutons d'action */
 button.hover-admin {
