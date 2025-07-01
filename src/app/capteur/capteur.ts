@@ -1,4 +1,4 @@
-import {Component, OnInit, signal, ViewChild} from '@angular/core';
+import {Component, OnInit, signal, ViewChild, AfterViewInit, OnDestroy} from '@angular/core';
 import {Footer} from '../footer/footer';
 import {Header} from '../header/header';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -23,8 +23,8 @@ import {Router} from '@angular/router';
 import {ConfirmDeleteDialogComponent} from './confirm-delete-dialog-component/confirm-delete-dialog-component';
 import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
 
-
-
+// Déclaration pour Leaflet
+declare var L: any;
 
 @Component({
   selector: 'app-capteur',
@@ -54,9 +54,15 @@ import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
   templateUrl: './capteur.html',
   styleUrl: './capteur.css'
 })
-export class Capteur implements OnInit {
+export class Capteur implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  // Propriétés pour la carte
+  private map: any;
+  private markers: any[] = [];
+  isMapLoading = signal(false);
+  selectedMapFilter = signal<'ALL' | 'ACTIF' | 'MAINTENANCE' | 'DEFAILLANT' | 'INACTIF'>('ALL');
 
   // Signals pour la gestion d'état
   currentAdmin = signal<AdminLoginResponse | null>(null);
@@ -108,6 +114,18 @@ export class Capteur implements OnInit {
     this.setupTableFiltering();
   }
 
+  ngAfterViewInit() {
+    // Charger Leaflet et initialiser la carte après le rendu de la vue
+    this.loadLeafletAndInitMap();
+  }
+
+  ngOnDestroy() {
+    // Nettoyer la carte lors de la destruction du composant
+    if (this.map) {
+      this.map.remove();
+    }
+  }
+
   private initializeSelectOptions() {
     this.typesCapteurs = this.capteurService.getTypesCapteurs();
     this.statutsCapteurs = this.capteurService.getStatutsCapteurs();
@@ -124,6 +142,7 @@ export class Capteur implements OnInit {
     this.currentAdmin.set(user);
   }
 
+  // MÉTHODE UNIQUE loadCapteurs (corrigée)
   protected loadCapteurs() {
     this.isLoading.set(true);
 
@@ -132,9 +151,16 @@ export class Capteur implements OnInit {
         this.capteurs.set(response.capteurs);
         this.dataSource.data = response.capteurs;
         this.setupPaginatorAndSort();
+
+        // Mettre à jour la carte si elle est initialisée
+        if (this.map) {
+          this.updateMapMarkers();
+        }
       },
       error: (error) => {
         this.showError('Erreur lors du chargement des capteurs: ' + error.message);
+        // En cas d'erreur, utiliser des données simulées avec coordonnées
+        this.loadSimulatedDataWithCoordinates();
       },
       complete: () => {
         this.isLoading.set(false);
@@ -155,6 +181,318 @@ export class Capteur implements OnInit {
     });
   }
 
+  // MÉTHODES POUR LA CARTE
+  private loadLeafletAndInitMap() {
+    // Vérifier si Leaflet est déjà chargé
+    if (typeof L !== 'undefined') {
+      this.initializeMap();
+      return;
+    }
+
+    this.isMapLoading.set(true);
+
+    // Charger dynamiquement Leaflet CSS
+    const linkElement = document.createElement('link');
+    linkElement.rel = 'stylesheet';
+    linkElement.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(linkElement);
+
+    // Charger dynamiquement Leaflet JS
+    const scriptElement = document.createElement('script');
+    scriptElement.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    scriptElement.onload = () => {
+      this.initializeMap();
+      this.isMapLoading.set(false);
+    };
+    scriptElement.onerror = () => {
+      this.showError('Erreur lors du chargement de la carte');
+      this.isMapLoading.set(false);
+    };
+    document.head.appendChild(scriptElement);
+  }
+
+  private initializeMap() {
+    // Attendre que l'élément DOM soit disponible
+    setTimeout(() => {
+      const mapElement = document.getElementById('capteurs-map');
+      if (!mapElement) {
+        console.error('Élément carte non trouvé');
+        return;
+      }
+
+      try {
+        // Initialiser la carte centrée sur Paris
+        this.map = L.map('capteurs-map').setView([48.8566, 2.3522], 11);
+
+        // Ajouter la couche de tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(this.map);
+
+        // Ajouter les marqueurs des capteurs
+        this.updateMapMarkers();
+
+        // Ajuster la vue pour inclure tous les marqueurs
+        this.fitMapToBounds();
+
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de la carte:', error);
+        this.showError('Erreur lors de l\'initialisation de la carte');
+      }
+    }, 100);
+  }
+
+  private updateMapMarkers() {
+    if (!this.map) return;
+
+    // Supprimer les marqueurs existants
+    this.markers.forEach(marker => this.map.removeLayer(marker));
+    this.markers = [];
+
+    // Filtrer les capteurs selon le filtre sélectionné
+    const filteredCapteurs = this.getFilteredCapteurs();
+
+    // Ajouter les nouveaux marqueurs
+    filteredCapteurs.forEach(capteur => {
+      if (capteur.latitude && capteur.longitude) {
+        const marker = this.createMarker(capteur);
+        this.markers.push(marker);
+        marker.addTo(this.map);
+      }
+    });
+  }
+
+  private createMarker(capteur: ResponseCapteurDTO): any {
+    const color = this.getMarkerColor(capteur.statut);
+    const icon = this.createCustomIcon(color);
+
+    const marker = L.marker([capteur.latitude, capteur.longitude], { icon })
+      .bindPopup(this.createPopupContent(capteur));
+
+    return marker;
+  }
+
+  private createCustomIcon(color: string): any {
+    return L.divIcon({
+      className: 'custom-marker',
+      html: `
+        <div style="
+          width: 20px;
+          height: 20px;
+          background-color: ${color};
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        "></div>
+      `,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+      popupAnchor: [0, -10]
+    });
+  }
+
+  private getMarkerColor(statut: string): string {
+    switch (statut) {
+      case 'ACTIF': return '#10b981'; // vert
+      case 'INACTIF': return '#6b7280'; // gris
+      case 'MAINTENANCE': return '#f59e0b'; // orange
+      case 'DEFAILLANT': return '#ef4444'; // rouge
+      default: return '#6b7280';
+    }
+  }
+
+  private createPopupContent(capteur: ResponseCapteurDTO): string {
+    return `
+      <div style="font-family: 'Inter', sans-serif; min-width: 200px;">
+        <div style="font-weight: 600; color: #1f2937; margin-bottom: 8px; font-size: 14px;">
+          ${capteur.nomCapteur}
+        </div>
+        <div style="font-size: 12px; color: #6b7280; margin: 4px 0;">
+          <strong>Type:</strong> ${capteur.typeCapteur}
+        </div>
+        <div style="font-size: 12px; color: #6b7280; margin: 4px 0;">
+          <strong>Gestionnaire:</strong> ${capteur.nomGestionnaireResponsable || 'Non assigné'}
+        </div>
+        ${capteur.adresseInstallation ? `
+          <div style="font-size: 12px; color: #6b7280; margin: 4px 0;">
+            <strong>Adresse:</strong> ${capteur.adresseInstallation}
+          </div>
+        ` : ''}
+        <div style="
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 500;
+          margin-top: 8px;
+          background: ${this.getStatusBackgroundColor(capteur.statut)};
+          color: ${this.getStatusTextColor(capteur.statut)};
+        ">
+          ${capteur.statut}
+        </div>
+      </div>
+    `;
+  }
+
+  private getStatusBackgroundColor(statut: string): string {
+    switch (statut) {
+      case 'ACTIF': return '#dcfce7';
+      case 'INACTIF': return '#f3f4f6';
+      case 'MAINTENANCE': return '#fef3c7';
+      case 'DEFAILLANT': return '#fee2e2';
+      default: return '#f3f4f6';
+    }
+  }
+
+  private getStatusTextColor(statut: string): string {
+    switch (statut) {
+      case 'ACTIF': return '#166534';
+      case 'INACTIF': return '#374151';
+      case 'MAINTENANCE': return '#92400e';
+      case 'DEFAILLANT': return '#991b1b';
+      default: return '#374151';
+    }
+  }
+
+  private getFilteredCapteurs(): ResponseCapteurDTO[] {
+    const filter = this.selectedMapFilter();
+    if (filter === 'ALL') {
+      return this.capteurs();
+    }
+    return this.capteurs().filter(capteur => capteur.statut === filter);
+  }
+
+  private fitMapToBounds() {
+    if (!this.map || this.markers.length === 0) return;
+
+    const group = new L.featureGroup(this.markers);
+    this.map.fitBounds(group.getBounds().pad(0.1));
+  }
+
+  // Méthodes publiques pour les actions de la carte
+  setMapFilter(filter: 'ALL' | 'ACTIF' | 'MAINTENANCE' | 'DEFAILLANT' | 'INACTIF') {
+    this.selectedMapFilter.set(filter);
+    this.updateMapMarkers();
+    if (this.markers.length > 0) {
+      this.fitMapToBounds();
+    }
+  }
+
+  centerMap() {
+    if (this.markers.length > 0) {
+      this.fitMapToBounds();
+    } else {
+      // Centrer sur Paris par défaut
+      this.map?.setView([48.8566, 2.3522], 11);
+    }
+  }
+
+  refreshMap() {
+    this.updateMapMarkers();
+    this.showSuccess('Carte actualisée');
+  }
+
+  getMapStats() {
+    const capteurs = this.capteurs();
+    return {
+      total: capteurs.length,
+      actifs: capteurs.filter(c => c.statut === 'ACTIF').length,
+      maintenance: capteurs.filter(c => c.statut === 'MAINTENANCE').length,
+      defaillants: capteurs.filter(c => c.statut === 'DEFAILLANT').length,
+      inactifs: capteurs.filter(c => c.statut === 'INACTIF').length
+    };
+  }
+
+  getCapteursWithCoordinates(): ResponseCapteurDTO[] {
+    return this.capteurs().filter(c => c.latitude && c.longitude);
+  }
+
+  private loadSimulatedDataWithCoordinates() {
+    // Données simulées avec coordonnées GPS pour la démonstration
+    const capteursSimules: any[] = [
+      {
+        idCapteur: 1,
+        nomCapteur: 'Capteur Centre-Ville #001',
+        typeCapteur: 'TEMPERATURE',
+        statut: 'ACTIF',
+        latitude: 48.8566,
+        longitude: 2.3522,
+        adresseInstallation: 'Place de la République, Paris',
+        nomGestionnaireResponsable: 'Marie Dubois',
+        typeGestionnaire: 'GESTIONNAIRE_VILLE',
+        dateInstallation: new Date('2023-06-15')
+      },
+      {
+        idCapteur: 2,
+        nomCapteur: 'Capteur Pollution #015',
+        typeCapteur: 'POLLUTION',
+        statut: 'MAINTENANCE',
+        latitude: 48.8606,
+        longitude: 2.3376,
+        adresseInstallation: 'Rue de Rivoli, Paris',
+        nomGestionnaireResponsable: 'Paul Leroy',
+        typeGestionnaire: 'ADMINISTRATEUR',
+        dateInstallation: new Date('2023-08-20')
+      },
+      {
+        idCapteur: 3,
+        nomCapteur: 'Capteur Trafic #008',
+        typeCapteur: 'TRAFIC',
+        statut: 'DEFAILLANT',
+        latitude: 48.8738,
+        longitude: 2.2950,
+        adresseInstallation: 'Avenue des Champs-Élysées, Paris',
+        nomGestionnaireResponsable: 'Marie Dubois',
+        typeGestionnaire: 'GESTIONNAIRE_VILLE',
+        dateInstallation: new Date('2023-05-10')
+      },
+      {
+        idCapteur: 4,
+        nomCapteur: 'Capteur Humidité #022',
+        typeCapteur: 'HUMIDITE',
+        statut: 'ACTIF',
+        latitude: 48.8529,
+        longitude: 2.3500,
+        adresseInstallation: 'Île Saint-Louis, Paris',
+        nomGestionnaireResponsable: 'Jean Martin',
+        typeGestionnaire: 'GESTIONNAIRE_VILLE',
+        dateInstallation: new Date('2023-07-12')
+      },
+      {
+        idCapteur: 5,
+        nomCapteur: 'Capteur Bruit #033',
+        typeCapteur: 'BRUIT',
+        statut: 'ACTIF',
+        latitude: 48.8584,
+        longitude: 2.2945,
+        adresseInstallation: 'Tour Eiffel, Paris',
+        nomGestionnaireResponsable: 'Sophie Moreau',
+        typeGestionnaire: 'CHERCHEUR',
+        dateInstallation: new Date('2023-09-05')
+      },
+      {
+        idCapteur: 6,
+        nomCapteur: 'Capteur Lumière #044',
+        typeCapteur: 'LUMINOSITE',
+        statut: 'INACTIF',
+        latitude: 48.8606,
+        longitude: 2.3354,
+        adresseInstallation: 'Musée du Louvre, Paris',
+        nomGestionnaireResponsable: 'Pierre Bernard',
+        typeGestionnaire: 'CHERCHEUR',
+        dateInstallation: new Date('2023-04-18')
+      }
+    ];
+
+    this.capteurs.set(capteursSimules);
+    this.dataSource.data = capteursSimules;
+
+    if (this.map) {
+      this.updateMapMarkers();
+    }
+  }
+
+  // FORMULAIRES
   private createFormGroup(): FormGroup {
     return this.fb.group({
       nomCapteur: ['', [Validators.required, Validators.maxLength(100)]],

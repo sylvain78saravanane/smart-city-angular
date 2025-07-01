@@ -688,6 +688,140 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Ajoutez cette section APRÈS la section "Liste des capteurs" et AVANT les "Statistiques rapides" -->
+
+    <!-- Carte de localisation des capteurs -->
+    <mat-card class="mt-6">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="bg-green-500 text-white">map</mat-icon>
+        <mat-card-title>Cartographie des Capteurs IoT</mat-card-title>
+        <mat-card-subtitle>Localisation géographique et état des capteurs en temps réel</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Statistiques de la carte -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-blue-50 p-4 rounded-lg text-center border border-blue-200">
+            <div class="text-2xl font-bold text-blue-600">{{ getMapStats().total }}</div>
+            <div class="text-xs text-blue-700 uppercase font-medium">Total Capteurs</div>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg text-center border border-green-200">
+            <div class="text-2xl font-bold text-green-600">{{ getMapStats().actifs }}</div>
+            <div class="text-xs text-green-700 uppercase font-medium">Actifs</div>
+          </div>
+          <div class="bg-orange-50 p-4 rounded-lg text-center border border-orange-200">
+            <div class="text-2xl font-bold text-orange-600">{{ getMapStats().maintenance }}</div>
+            <div class="text-xs text-orange-700 uppercase font-medium">Maintenance</div>
+          </div>
+          <div class="bg-red-50 p-4 rounded-lg text-center border border-red-200">
+            <div class="text-2xl font-bold text-red-600">{{ getMapStats().defaillants }}</div>
+            <div class="text-xs text-red-700 uppercase font-medium">Défaillants</div>
+          </div>
+        </div>
+
+        <!-- Contrôles de la carte -->
+        <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
+          <div class="flex flex-wrap gap-2">
+            <button
+              mat-button
+              [class.mat-primary]="selectedMapFilter() === 'ALL'"
+              (click)="setMapFilter('ALL')"
+              class="text-sm">
+              <mat-icon class="mr-1 text-sm">list</mat-icon>
+              Tous ({{ getMapStats().total }})
+            </button>
+            <button
+              mat-button
+              [class.mat-primary]="selectedMapFilter() === 'ACTIF'"
+              (click)="setMapFilter('ACTIF')"
+              class="text-sm">
+              <mat-icon class="mr-1 text-sm text-green-500">check_circle</mat-icon>
+              Actifs ({{ getMapStats().actifs }})
+            </button>
+            <button
+              mat-button
+              [class.mat-primary]="selectedMapFilter() === 'MAINTENANCE'"
+              (click)="setMapFilter('MAINTENANCE')"
+              class="text-sm">
+              <mat-icon class="mr-1 text-sm text-orange-500">build</mat-icon>
+              Maintenance ({{ getMapStats().maintenance }})
+            </button>
+            <button
+              mat-button
+              [class.mat-primary]="selectedMapFilter() === 'DEFAILLANT'"
+              (click)="setMapFilter('DEFAILLANT')"
+              class="text-sm">
+              <mat-icon class="mr-1 text-sm text-red-500">error</mat-icon>
+              Défaillants ({{ getMapStats().defaillants }})
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <button
+              mat-icon-button
+              (click)="centerMap()"
+              matTooltip="Centrer la carte">
+              <mat-icon>my_location</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="refreshMap()"
+              matTooltip="Actualiser la carte">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Container de la carte -->
+        <div class="map-container bg-gray-100 rounded-lg overflow-hidden border border-gray-200"
+             style="height: 500px; position: relative;">
+          @if (isMapLoading()) {
+            <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+              <div class="text-center">
+                <mat-spinner diameter="40" class="mb-4"></mat-spinner>
+                <p class="text-gray-600">Chargement de la carte...</p>
+              </div>
+            </div>
+          }
+          <div id="capteurs-map" style="height: 100%; width: 100%;"></div>
+        </div>
+
+        <!-- Légende -->
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3 flex items-center">
+            <mat-icon class="mr-2 text-sm">info</mat-icon>
+            Légende des statuts
+          </h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="flex items-center space-x-2 text-sm">
+              <div class="w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow"></div>
+              <span class="text-gray-700">Capteur Actif</span>
+            </div>
+            <div class="flex items-center space-x-2 text-sm">
+              <div class="w-4 h-4 bg-gray-500 rounded-full border-2 border-white shadow"></div>
+              <span class="text-gray-700">Capteur Inactif</span>
+            </div>
+            <div class="flex items-center space-x-2 text-sm">
+              <div class="w-4 h-4 bg-orange-500 rounded-full border-2 border-white shadow"></div>
+              <span class="text-gray-700">En Maintenance</span>
+            </div>
+            <div class="flex items-center space-x-2 text-sm">
+              <div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow"></div>
+              <span class="text-gray-700">Défaillant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message si aucun capteur avec coordonnées -->
+        @if (getCapteursWithCoordinates().length === 0) {
+          <div class="text-center py-8 text-gray-500">
+            <mat-icon class="text-4xl mb-2">location_off</mat-icon>
+            <p>Aucun capteur avec coordonnées GPS disponible</p>
+            <p class="text-sm">Ajoutez des coordonnées aux capteurs pour les voir sur la carte</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
     <!-- Statistiques rapides -->
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- Total capteurs -->
