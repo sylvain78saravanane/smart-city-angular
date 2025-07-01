@@ -12,7 +12,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSelectModule} from '@angular/material/select';
 import {MatDividerModule} from '@angular/material/divider';
 import {Header} from '../header/header';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {Footer} from '../footer/footer';
 import {AuthService, LoginRequest, LoginResponse} from '../services/auth.service';
 
@@ -89,7 +89,6 @@ export class PageConnexionChercheur {
   }
 
   private handleLoginSuccess(response: LoginResponse) {
-    // Les données sont déjà stockées par le service AuthService
 
     // Message de bienvenue personnalisé pour les chercheurs
     const welcomeMessage = response.donneesSpecifiques?.institut
@@ -101,7 +100,6 @@ export class PageConnexionChercheur {
       panelClass: ['success-snackbar']
     });
 
-    // Redirection vers le dashboard chercheur
     this.router.navigate(['/dashboard/chercheur']);
   }
 

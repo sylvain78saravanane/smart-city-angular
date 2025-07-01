@@ -12,6 +12,23 @@
       <p class="subtitle">La ville intelligente de TechCity</p>
     </div>
 
+    <!-- Boutons d'action -->
+    <div class="action-buttons" [class.visible]="buttonsVisible()" style="margin-bottom: 2pc">
+      <button mat-raised-button
+              class="action-btn login-btn"
+              (click)="onLogin()">
+        <mat-icon>login</mat-icon>
+        Se connecter
+      </button>
+
+      <button mat-raised-button
+              class="action-btn register-btn"
+              (click)="onRegisterCitoyen()">
+        <mat-icon>person_add</mat-icon>
+        S'inscrire en tant que Citoyen
+      </button>
+    </div>
+
     <!-- Les 3 nuages -->
     <div class="clouds-section">
 
@@ -47,31 +64,6 @@
           <p class="cloud-text">{{clouds[2].content}}</p>
         </div>
       </div>
-    </div>
-
-    <!-- Boutons d'action -->
-    <div class="action-buttons" [class.visible]="buttonsVisible()">
-
-      <button mat-raised-button
-              class="action-btn discover-btn"
-              (click)="onDiscoverSolution()">
-        <mat-icon>explore</mat-icon>
-        Découvrir la solution
-      </button>
-
-      <button mat-raised-button
-              class="action-btn login-btn"
-              (click)="onLogin()">
-        <mat-icon>login</mat-icon>
-        Se connecter
-      </button>
-
-      <button mat-raised-button
-              class="action-btn register-btn"
-              (click)="onRegisterCitoyen()">
-        <mat-icon>person_add</mat-icon>
-        S'inscrire en tant que Citoyen
-      </button>
     </div>
   </div>
 </main>
