@@ -43,9 +43,6 @@ export class Footer {
   // Liens légaux
   legalLinks = [
     { label: 'Mentions légales', route: '/mentions-legales' },
-    { label: 'Politique de confidentialité', route: '/privacy' },
-    { label: 'Conditions d\'utilisation', route: '/terms' },
-    { label: 'Plan du site', route: '/plan' }
   ];
 
   // Réseaux sociaux
